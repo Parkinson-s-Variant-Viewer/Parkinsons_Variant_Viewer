@@ -3,8 +3,8 @@ import csv
 from parkinsons_variant_viewer.hgvs_variant import HGVSVariant
 from parkinsons_variant_viewer.clinvar_api import fetch_clinvar_variant, get_variant_info
 
-INPUT_VCF = "data/input/Patient3.vcf"  # replace with desired VCF 
-OUTPUT_CSV = "data/output/Patient3_variant_clinvar_summary.csv"
+INPUT_VCF = "data/input/Patient1.vcf"  # replace with desired VCF
+OUTPUT_CSV = "data/output/Patient1_variant_clinvar_summary.csv"
 
 
 def read_pseudo_vcf(vcf_file):
