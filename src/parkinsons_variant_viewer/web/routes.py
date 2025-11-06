@@ -29,6 +29,7 @@ def index():
             o.ref_seq_id,
             o.hgnc_id,
             o.omim_id,
+            o.gene_symbol,          
             o.g_change,
             o.c_change,
             o.p_change
