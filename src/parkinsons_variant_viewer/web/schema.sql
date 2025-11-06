@@ -31,6 +31,7 @@ CREATE TABLE outputs(
     ref_seq_id TEXT, 
     hgnc_id TEXT,
     omim_id TEXT,
+    gene_symbol TEXT,
     g_change TEXT,
     c_change TEXT,
     p_change TEXT,
