@@ -11,7 +11,7 @@ from src.parkinsons_variant_viewer.populate_db import populate_database
 def main():
     # Print out the help menu describing usage of run.py when arguments are not specified. 
     if len(sys.argv) < 2:
-        print("Usage: python run.py [web | init-db | load-vcfs | annotate]")
+        print("Usage: python run.py [web | init-db | reset-db | load-vcfs | annotate]")
         sys.exit(1)
 
     cmd = sys.argv[1].lower()
@@ -23,9 +23,36 @@ def main():
         app.run(host="0.0.0.0", port=5000)
 
     elif cmd == "init-db":
+        # Safe init: only create if database does not already exist. 
+        with app.app_context():
+            db_path = get_db_path()
+
+        if os.path.exists(db_path):
+            print(f"Database already exists at: {db_path}")
+            print("If you want to wipe and recreate it, run:")
+            print("python run.py reset-db")
+            sys.exit(1)
+        
         with app.app_context():
             init_db()
-        print("Database initialised.")
+        print(f"Database initialised at {db_path}.")
+
+    elif cmd == "reset-db":
+        # Always recreate database even if one exists already
+        with app.app_context():
+            db_path = get_db_path()
+
+        print(f"WARNING: This will erase all data in {db_path}")
+
+        if sys.stdin.isatty():
+            confirm = input("Type 'yes' to continue:")
+            if confirm.lower() != "yes":
+                print("Aborting reset.")
+                sys.exit(1)
+        
+        with app.app_context():
+            init_db()
+            print(f"Database reset at {db_path}.")
 
     elif cmd == "load-vcfs":
         vcf_dir = "data/input"
