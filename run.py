@@ -5,10 +5,11 @@ import os
 from src.parkinsons_variant_viewer.web import create_app
 from src.parkinsons_variant_viewer.web.db import init_db, get_db_path
 from src.parkinsons_variant_viewer.web.loaders.vcf_loader import load_vcf_into_db
-from src.parkinsons_variant_viewer.populate_db import main as annotate_main
+from src.parkinsons_variant_viewer.populate_db import populate_database
 
 
 def main():
+    # Print out the help menu describing usage of run.py when arguments are not specified. 
     if len(sys.argv) < 2:
         print("Usage: python run.py [web | init-db | load-vcfs | annotate]")
         sys.exit(1)
@@ -49,7 +50,7 @@ def main():
 
     elif cmd == "annotate":
         print("Running annotation pipeline... (this may take time)")
-        annotate_main()
+        populate_database()
         print("Annotation complete.")
 
     else:
