@@ -2,64 +2,187 @@
 <html>
 <head>
     <title>Variants</title>
+    <style>
+        /* Page styling */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        
+        /* Button styling for toggle and clear buttons */
+        .toggle-btn {
+            background-color: #667eea;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 10px 0;
+        }
+        .toggle-btn:hover {
+            background-color: #5568d3;
+        }
+        
+        /* Hide detailed columns when in simplified view */
+        .hide-detailed {
+            display: none;
+        }
+        
+        /* Alternating row colors for better readability */
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        
+        /* Search container styling */
+        .search-container {
+            margin: 20px 0;
+            padding: 10px 0;
+        }
+        .search-container input {
+            padding: 5px;
+            margin-right: 10px;
+            border: 1px solid #ccc;
+        }
+        
+        /* Hide rows that don't match search criteria */
+        .hidden-row {
+            display: none;
+        }
+    </style>
+    <script>
+        /* Toggle between simplified and detailed view */
+        function toggleView() {
+            const detailedCols = document.querySelectorAll('.detailed-col');
+            const btn = document.getElementById('toggleBtn');
+            const isHidden = detailedCols[0].classList.contains('hide-detailed');
+            
+            detailedCols.forEach(col => {
+                if (isHidden) {
+                    col.classList.remove('hide-detailed');
+                    btn.textContent = '📊 Show Simplified View';
+                } else {
+                    col.classList.add('hide-detailed');
+                    btn.textContent = '📋 Show Detailed View';
+                }
+            });
+        }
+
+        /* Filter table rows based on search inputs */
+        function searchTable() {
+            const patientInput = document.getElementById('searchPatient').value.toLowerCase();
+            const geneInput = document.getElementById('searchGene').value.toLowerCase();
+            const variantInput = document.getElementById('searchVariant').value.toLowerCase();
+            
+            const table = document.querySelector('table');
+            const rows = table.querySelectorAll('tr.data-row');
+            
+            rows.forEach(row => {
+                const patient = row.getAttribute('data-patient').toLowerCase();
+                const gene = row.getAttribute('data-gene').toLowerCase();
+                const variant = row.getAttribute('data-variant').toLowerCase();
+                
+                const matchPatient = patientInput === '' || patient.includes(patientInput);
+                const matchGene = geneInput === '' || gene.includes(geneInput);
+                const matchVariant = variantInput === '' || variant.includes(variantInput);
+                
+                if (matchPatient && matchGene && matchVariant) {
+                    row.classList.remove('hidden-row');
+                } else {
+                    row.classList.add('hidden-row');
+                }
+            });
+        }
+
+        /* Clear all search fields and show all rows */
+        function clearSearch() {
+            document.getElementById('searchPatient').value = '';
+            document.getElementById('searchGene').value = '';
+            document.getElementById('searchVariant').value = '';
+            searchTable();
+        }
+    </script>
 </head>
 <body>
     <h1>All Variants</h1>
 
+    <!-- Navigation links -->
     <p><a href="{{ url_for('web.add_variant') }}">Add a new input variant</a></p>
     <a href="{{ url_for('web.view_inputs') }}">View raw inputs</a>
 
+    <!-- Search filters section -->
+    <div class="search-container">
+        <strong>Search:</strong>
+        Patient ID: <input type="text" id="searchPatient" placeholder="1, 2, 3..." onkeyup="searchTable()">
+        Gene: <input type="text" id="searchGene" placeholder="MAPT, SNCA..." onkeyup="searchTable()">
+        Variant ID: <input type="text" id="searchVariant" placeholder="VCV..." onkeyup="searchTable()">
+        <button class="toggle-btn" onclick="clearSearch()">Clear</button>
+    </div>
+
+    <!-- Toggle button to switch between simplified and detailed view -->
+    <button id="toggleBtn" class="toggle-btn" onclick="toggleView()">📊 Show Simplified View</button>
+
+    <!-- Variants table -->
     <table border="1" cellpadding="5" cellspacing="0">
         <tr>
+            <!-- Always visible columns -->
             <th>Patient</th>
             <th>Variant #</th>
+            <th>HGVS</th>
             <th>CHROM</th>
             <th>POS</th>
-            <th>ID</th>
             <th>REF</th>
             <th>ALT</th>
-
-            <!-- Output fields -->
-            <th>HGVS</th>
-            <th>ClinVar ID</th>
+            <th>Gene Symbol</th>
             <th>Clinical Significance</th>
             <th>Star Rating</th>
-            <th>Review Status</th>
-            <th>Conditions</th>
-            <th>Transcript</th>
-            <th>RefSeq ID</th>
-            <th>HGNC ID</th>
-            <th>OMIM ID</th>
-            <th>Gene Symbol</th>
-            <th>g. Change</th>
-            <th>c. Change</th>
-            <th>p. Change</th>
+
+            <!-- Detailed columns (hidden in simplified view) -->
+            <th class="detailed-col">ID</th>
+            <th class="detailed-col">ClinVar ID</th>
+            <th class="detailed-col">Review Status</th>
+            <th class="detailed-col">Conditions</th>
+            <th class="detailed-col">Transcript</th>
+            <th class="detailed-col">RefSeq ID</th>
+            <th class="detailed-col">HGNC ID</th>
+            <th class="detailed-col">OMIM ID</th>
+            <th class="detailed-col">g. Change</th>
+            <th class="detailed-col">c. Change</th>
+            <th class="detailed-col">p. Change</th>
         </tr>
 
+        <!-- Loop through all variants and display as table rows -->
         {% for v in variants %}
-        <tr>
+        <!-- Data attributes for search functionality -->
+        <tr class="data-row" 
+            data-patient="{{ v.patient_id }}" 
+            data-gene="{{ v.gene_symbol or '' }}" 
+            data-variant="{{ v.variant_id or v.id or '' }}">
+            
+            <!-- Always visible columns -->
             <td>{{ v.patient_id }}</td>
             <td>{{ v.variant_number }}</td>
+            <td>{{ v.hgvs or '' }}</td>
             <td>{{ v.chrom }}</td>
             <td>{{ v.pos }}</td>
-            <td>{{ v.id }}</td>
             <td>{{ v.ref }}</td>
             <td>{{ v.alt }}</td>
-
-            <td>{{ v.hgvs or '' }}</td>
-            <td>{{ v.clinvar_id or '' }}</td>
+            <td>{{ v.gene_symbol or '' }}</td>
             <td>{{ v.clinical_significance or '' }}</td>
             <td>{{ v.star_rating or '' }}</td>
-            <td>{{ v.review_status or '' }}</td>
-            <td>{{ v.conditions_assoc or '' }}</td>
-            <td>{{ v.transcript or '' }}</td>
-            <td>{{ v.ref_seq_id or '' }}</td>
-            <td>{{ v.hgnc_id or '' }}</td>
-            <td>{{ v.omim_id or '' }}</td>
-            <td>{{ v.gene_symbol or '' }}</td>
-            <td>{{ v.g_change or '' }}</td>
-            <td>{{ v.c_change or '' }}</td>
-            <td>{{ v.p_change or '' }}</td>
+
+            <!-- Detailed columns (hidden in simplified view) -->
+            <td class="detailed-col">{{ v.id }}</td>
+            <td class="detailed-col">{{ v.clinvar_id or '' }}</td>
+            <td class="detailed-col">{{ v.review_status or '' }}</td>
+            <td class="detailed-col">{{ v.conditions_assoc or '' }}</td>
+            <td class="detailed-col">{{ v.transcript or '' }}</td>
+            <td class="detailed-col">{{ v.ref_seq_id or '' }}</td>
+            <td class="detailed-col">{{ v.hgnc_id or '' }}</td>
+            <td class="detailed-col">{{ v.omim_id or '' }}</td>
+            <td class="detailed-col">{{ v.g_change or '' }}</td>
+            <td class="detailed-col">{{ v.c_change or '' }}</td>
+            <td class="detailed-col">{{ v.p_change or '' }}</td>
         </tr>
         {% endfor %}
     </table>
