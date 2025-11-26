@@ -173,13 +173,21 @@
 
             <!-- Detailed columns (hidden in simplified view) -->
             <td class="detailed-col">{{ v.id }}</td>
-            <td class="detailed-col">{{ v.clinvar_id or '' }}</td>
+            <td class="detailed-col">
+                {% if v.clinvar_id %}
+                    <a href="https://www.ncbi.nlm.nih.gov/clinvar/variation/{{ v.clinvar_id }}/" target="_blank">{{ v.clinvar_id }}</a>
+                {% endif %}
+            </td>
             <td class="detailed-col">{{ v.review_status or '' }}</td>
             <td class="detailed-col">{{ v.conditions_assoc or '' }}</td>
             <td class="detailed-col">{{ v.transcript or '' }}</td>
             <td class="detailed-col">{{ v.ref_seq_id or '' }}</td>
             <td class="detailed-col">{{ v.hgnc_id or '' }}</td>
-            <td class="detailed-col">{{ v.omim_id or '' }}</td>
+            <td class="detailed-col">
+                {% if v.omim_id %}
+                    <a href="https://www.omim.org/entry/{{ v.omim_id }}" target="_blank">{{ v.omim_id }}</a>
+                {% endif %}
+            </td>
             <td class="detailed-col">{{ v.g_change or '' }}</td>
             <td class="detailed-col">{{ v.c_change or '' }}</td>
             <td class="detailed-col">{{ v.p_change or '' }}</td>
