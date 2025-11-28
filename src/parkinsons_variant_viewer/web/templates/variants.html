@@ -115,7 +115,7 @@
         <strong>Search:</strong>
         Patient ID: <input type="text" id="searchPatient" placeholder="1, 2, 3..." onkeyup="searchTable()">
         Gene: <input type="text" id="searchGene" placeholder="MAPT, SNCA..." onkeyup="searchTable()">
-        Variant ID: <input type="text" id="searchVariant" placeholder="VCV..." onkeyup="searchTable()">
+        HGVS: <input type="text" id="searchVariant" placeholder="NC_000017.11:g..." onkeyup="searchTable()">
         <button class="toggle-btn" onclick="clearSearch()">Clear</button>
     </div>
 
@@ -157,7 +157,7 @@
         <tr class="data-row" 
             data-patient="{{ v.patient_id }}" 
             data-gene="{{ v.gene_symbol or '' }}" 
-            data-variant="{{ v.variant_id or v.id or '' }}">
+            data-variant="{{ v.hgvs or '' }}">
             
             <!-- Always visible columns -->
             <td>{{ v.patient_id }}</td>
@@ -167,19 +167,34 @@
             <td>{{ v.pos }}</td>
             <td>{{ v.ref }}</td>
             <td>{{ v.alt }}</td>
-            <td>{{ v.gene_symbol or '' }}</td>
+            <!-- Link from gene symbol to HGNC page using HGNC ID -->
+            <td>
+                {% if v.gene_symbol and v.hgnc_id %}
+                    <a href="https://www.genenames.org/data/gene-symbol-report/#!/hgnc_id/{{ v.hgnc_id }}" target="_blank">{{ v.gene_symbol }}</a>
+                {% else %}
+                    {{ v.gene_symbol or '' }}
+                {% endif %}
+            </td>
             <td>{{ v.clinical_significance or '' }}</td>
             <td>{{ v.star_rating or '' }}</td>
 
             <!-- Detailed columns (hidden in simplified view) -->
             <td class="detailed-col">{{ v.id }}</td>
-            <td class="detailed-col">{{ v.clinvar_id or '' }}</td>
+            <td class="detailed-col">
+                {% if v.clinvar_id %}
+                    <a href="https://www.ncbi.nlm.nih.gov/clinvar/variation/{{ v.clinvar_id }}/" target="_blank">{{ v.clinvar_id }}</a>
+                {% endif %}
+            </td>
             <td class="detailed-col">{{ v.review_status or '' }}</td>
             <td class="detailed-col">{{ v.conditions_assoc or '' }}</td>
             <td class="detailed-col">{{ v.transcript or '' }}</td>
             <td class="detailed-col">{{ v.ref_seq_id or '' }}</td>
             <td class="detailed-col">{{ v.hgnc_id or '' }}</td>
-            <td class="detailed-col">{{ v.omim_id or '' }}</td>
+            <td class="detailed-col">
+                {% if v.omim_id %}
+                    <a href="https://www.omim.org/entry/{{ v.omim_id }}" target="_blank">{{ v.omim_id }}</a>
+                {% endif %}
+            </td>
             <td class="detailed-col">{{ v.g_change or '' }}</td>
             <td class="detailed-col">{{ v.c_change or '' }}</td>
             <td class="detailed-col">{{ v.p_change or '' }}</td>
