@@ -16,6 +16,26 @@ class ClinVarApiError(Exception):
     """Custom exception for ClinVar API errors."""
     pass
     
+def fetch_hgnc_id(gene_symbol):
+    """Fetch HGNC ID from gene symbol using HGNC API."""
+    try:
+        url = f"https://rest.genenames.org/fetch/symbol/{gene_symbol}"
+        headers = {'Accept': 'application/json'}
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        
+        data = response.json()
+        if data.get('response', {}).get('numFound', 0) > 0:
+            docs = data['response']['docs']
+            if docs:
+                hgnc_id = docs[0].get('hgnc_id')
+                if hgnc_id:
+                    # HGNC ID comes as "HGNC:6893"
+                    return hgnc_id
+    except Exception as e:
+        logger.warning(f"Failed to fetch HGNC ID for {gene_symbol}: {e}")
+    
+    return None
 
 def fetch_clinvar_variant(hgvs):
     """Fetch ClinVar data for HGVS variant."""
@@ -239,9 +259,12 @@ def get_variant_info(data):
         for gene in genes:
             if isinstance(gene, dict):
                 result['gene_symbol'] = gene.get("symbol", "")
-                gene_id = gene.get("GeneID", "")
-                if gene_id:
-                    result['hgnc_id'] = f"GeneID:{gene_id}"
+                
+                # Fetch HGNC ID from HGNC API using gene symbol
+                if result['gene_symbol']:
+                    hgnc_id = fetch_hgnc_id(result['gene_symbol'])
+                    if hgnc_id:
+                        result['hgnc_id'] = hgnc_id
                 break
         # if protein change not found from title, try the summary protein_change field
         if not result.get('p_change'):

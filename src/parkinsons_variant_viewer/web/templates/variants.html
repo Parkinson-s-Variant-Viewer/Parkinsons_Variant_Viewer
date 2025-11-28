@@ -167,7 +167,14 @@
             <td>{{ v.pos }}</td>
             <td>{{ v.ref }}</td>
             <td>{{ v.alt }}</td>
-            <td>{{ v.gene_symbol or '' }}</td>
+            <!-- Link from gene symbol to HGNC page using HGNC ID -->
+            <td>
+                {% if v.gene_symbol and v.hgnc_id %}
+                    <a href="https://www.genenames.org/data/gene-symbol-report/#!/hgnc_id/{{ v.hgnc_id }}" target="_blank">{{ v.gene_symbol }}</a>
+                {% else %}
+                    {{ v.gene_symbol or '' }}
+                {% endif %}
+            </td>
             <td>{{ v.clinical_significance or '' }}</td>
             <td>{{ v.star_rating or '' }}</td>
 
