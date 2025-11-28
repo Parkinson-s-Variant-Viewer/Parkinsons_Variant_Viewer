@@ -2,10 +2,10 @@
 import sys
 import os
 
-from src.parkinsons_variant_viewer.web import create_app
-from src.parkinsons_variant_viewer.web.db import init_db, get_db_path
-from src.parkinsons_variant_viewer.web.loaders.vcf_loader import load_vcf_into_db
-from src.parkinsons_variant_viewer.populate_db import populate_database
+from parkinsons_variant_viewer.web import create_app
+from parkinsons_variant_viewer.web.db import init_db, get_db_path
+from parkinsons_variant_viewer.web.loaders.vcf_loader import load_vcf_into_db
+from parkinsons_variant_viewer.populate_db import populate_database
 
 
 def main():
