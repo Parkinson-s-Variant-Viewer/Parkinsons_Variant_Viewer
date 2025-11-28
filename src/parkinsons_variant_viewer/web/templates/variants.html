@@ -115,7 +115,7 @@
         <strong>Search:</strong>
         Patient ID: <input type="text" id="searchPatient" placeholder="1, 2, 3..." onkeyup="searchTable()">
         Gene: <input type="text" id="searchGene" placeholder="MAPT, SNCA..." onkeyup="searchTable()">
-        Variant ID: <input type="text" id="searchVariant" placeholder="VCV..." onkeyup="searchTable()">
+        HGVS: <input type="text" id="searchVariant" placeholder="NC_000017.11:g..." onkeyup="searchTable()">
         <button class="toggle-btn" onclick="clearSearch()">Clear</button>
     </div>
 
@@ -157,7 +157,7 @@
         <tr class="data-row" 
             data-patient="{{ v.patient_id }}" 
             data-gene="{{ v.gene_symbol or '' }}" 
-            data-variant="{{ v.variant_id or v.id or '' }}">
+            data-variant="{{ v.hgvs or '' }}">
             
             <!-- Always visible columns -->
             <td>{{ v.patient_id }}</td>
