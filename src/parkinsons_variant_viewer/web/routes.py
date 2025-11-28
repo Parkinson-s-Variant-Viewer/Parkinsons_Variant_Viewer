@@ -83,3 +83,20 @@ def view_inputs():
     """).fetchall()
 
     return render_template("inputs.html", inputs=rows)
+
+# Route to upload patient data (VCF/CSV)
+@bp.route("/upload", methods=["GET", "POST"])
+def upload_data():
+    if request.method == "POST":
+        file = request.files.get("file")
+        if file:
+            filename = file.filename
+            save_path = f"data/uploads/{filename}"  # ensure this folder exists
+            file.save(save_path)
+
+            # Call handler to insert into DB and fetch ClinVar
+            from .loaders.upload_handler import handle_uploaded_file
+            handle_uploaded_file(save_path)
+
+            return f"File '{filename}' uploaded and processed successfully!"
+    return render_template("upload_data.html")
