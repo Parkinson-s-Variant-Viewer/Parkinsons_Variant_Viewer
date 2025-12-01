@@ -1,0 +1,15 @@
+<!doctype html>
+<html>
+<head>
+    <title>Upload Patient Data</title>
+</head>
+<body>
+    <h1>Upload Patient Data (VCF/CSV)</h1>
+    <form method="post" enctype="multipart/form-data">
+        <input type="file" name="file" accept=".vcf,.csv" required>
+        <button type="submit">Upload</button>
+    </form>
+
+    <p><a href="{{ url_for('web.index') }}">Back to main page</a></p>
+</body>
+</html>
