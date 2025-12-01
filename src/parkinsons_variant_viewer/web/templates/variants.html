@@ -106,9 +106,9 @@
 <body>
     <h1>All Variants</h1>
 
-    <!-- Navigation links -->
-    <p><a href="{{ url_for('web.add_variant') }}">Add a new input variant</a></p>
-    <p><a href="{{ url_for('web.view_inputs') }}">View raw inputs</a></p>
+    <!-- Navigation buttons -->
+    <button class="toggle-btn" onclick="window.location.href='{{ url_for('web.add_variant') }}'">Add a new input variant</button>  <!--*** -->
+    <button class="toggle-btn" onclick="window.location.href='{{ url_for('web.view_inputs') }}'">View raw inputs</button>  <!--*** -->
 
     <!-- Upload button: opens file picker and triggers upload via AJAX -->
     <button id="uploadBtn" class="toggle-btn">Upload VCF/CSV</button>
