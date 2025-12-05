@@ -71,7 +71,8 @@ def add_variant():
 
     return render_template("add_variant.html")
 
-# Route to view the table of input data 
+
+# Route to view the table of input data
 @bp.route("/inputs")
 def view_inputs():
     db = get_db()
@@ -83,3 +84,21 @@ def view_inputs():
     """).fetchall()
 
     return render_template("inputs.html", inputs=rows)
+
+
+# Route to handle AJAX file upload from main page
+@bp.route("/upload", methods=["POST"])
+def upload_data():
+    file = request.files.get("file")
+    if not file:
+        return "No file uploaded", 400
+
+    filename = file.filename
+    save_path = f"data/uploads/{filename}"  # ensure this folder exists
+    file.save(save_path)
+
+    # Call handler to insert into DB and fetch ClinVar
+    from .loaders.upload_handler import handle_uploaded_file
+    handle_uploaded_file(save_path)
+
+    return "OK", 200

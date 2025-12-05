@@ -43,7 +43,28 @@ It aims to enable them to:
 
 ---
 
-See Installation_manual.md 
+**Step 1: Clone the repository**
+```bash
+git clone git@github.com:patricklahert/Parkinsons_Variant_Viewer.git
+```
+
+**Step 2: Create the conda environment**
+```bash
+conda env create -f environment.yml 
+conda activate pvv_conda
+```
+
+**Step 3: Install requirements**
+```bash
+pip install -r requirements.txt
+```
+
+**Step 4: Install Parkinsons Variant Viewer**
+```bash
+python -m pip install -e . 
+```
+
+For detailed installation instructions, see `Installation_manual.md`
 
 ## 📚 User Guide
 
