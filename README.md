@@ -1,4 +1,7 @@
 # Parkinsons Variant Viewer
+
+[![codecov](https://codecov.io/gh/patricklahert/Parkinsons_Variant_Viewer/branch/main/graph/badge.svg)](https://codecov.io/gh/patricklahert/Parkinsons_Variant_Viewer)
+
 <img src="docs/images/PVV_logo.png" alt="PVV Logo" width="500">
 
 ## 📖 About
