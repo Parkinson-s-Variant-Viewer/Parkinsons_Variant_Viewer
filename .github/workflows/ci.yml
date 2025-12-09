@@ -31,8 +31,20 @@ jobs:
           pip install -r requirements.txt
           pip install -e .
 
-      - name: Run tests
-        run: pytest
+      - name: Run test with coverage
+        run: |
+          pytest \
+            --cov=parkinsons_variant_viewer \
+            --cov-report=xml \
+            --cov-report=term
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with: 
+          token: ${{b4592b69-aadf-4614-aa64-119a3675e22e}}
+          files: coverage.xml
+          flags: unittests
+          fail_ci_if_error: true
 
   docker-build:
     runs-on: ubuntu-latest
