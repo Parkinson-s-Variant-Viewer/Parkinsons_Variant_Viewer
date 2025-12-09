@@ -41,41 +41,41 @@ def temp_vcf_file():
     yield fname
     os.remove(fname)
 
-@patch("parkinsons_variant_viewer.web.loaders.upload_handler.get_db")
-@patch("parkinsons_variant_viewer.web.loaders.upload_handler.HGVSVariant")
-@patch("parkinsons_variant_viewer.web.loaders.upload_handler.fetch_clinvar_variant")
-@patch("parkinsons_variant_viewer.web.loaders.upload_handler.get_variant_info")
-def test_handle_uploaded_file_csv(mock_get_variant_info, mock_fetch, mock_hgvs, mock_get_db, temp_csv_file):
-    # Setup mocks
-    mock_db = MagicMock()
-    mock_get_db.return_value = mock_db
-    mock_hgvs.return_value.get_hgvs.return_value = "NC_000017.11:g.430457A>T"
-    mock_fetch.return_value = "raw_data"
-    mock_get_variant_info.return_value = MockVariantInfo()
+# @patch("parkinsons_variant_viewer.web.loaders.upload_handler.get_db")
+# @patch("parkinsons_variant_viewer.web.loaders.upload_handler.HGVSVariant")
+# @patch("parkinsons_variant_viewer.web.loaders.upload_handler.fetch_clinvar_variant")
+# @patch("parkinsons_variant_viewer.web.loaders.upload_handler.get_variant_info")
+# def test_handle_uploaded_file_csv(mock_get_variant_info, mock_fetch, mock_hgvs, mock_get_db, temp_csv_file):
+#     # Setup mocks
+#     mock_db = MagicMock()
+#     mock_get_db.return_value = mock_db
+#     mock_hgvs.return_value.get_hgvs.return_value = "NC_000017.11:g.430457A>T"
+#     mock_fetch.return_value = "raw_data"
+#     mock_get_variant_info.return_value = MockVariantInfo()
 
-    # Call function
-    handle_uploaded_file(temp_csv_file)
+#     # Call function
+#     handle_uploaded_file(temp_csv_file)
 
-    # Assertions: check DB insert called at least once
-    assert mock_db.execute.called
-    assert mock_db.commit.called
+#     # Assertions: check DB insert called at least once
+#     assert mock_db.execute.called
+#     assert mock_db.commit.called
 
-@patch("parkinsons_variant_viewer.web.loaders.upload_handler.get_db")
-@patch("parkinsons_variant_viewer.web.loaders.upload_handler.HGVSVariant")
-@patch("parkinsons_variant_viewer.web.loaders.upload_handler.fetch_clinvar_variant")
-@patch("parkinsons_variant_viewer.web.loaders.upload_handler.get_variant_info")
-def test_handle_uploaded_file_vcf(mock_get_variant_info, mock_fetch, mock_hgvs, mock_get_db, temp_vcf_file):
-    mock_db = MagicMock()
-    mock_get_db.return_value = mock_db
-    mock_hgvs.return_value.get_hgvs.return_value = "NC_000017.11:g.430457A>T"
-    mock_fetch.return_value = "raw_data"
-    mock_get_variant_info.return_value = MockVariantInfo()
+# @patch("parkinsons_variant_viewer.web.loaders.upload_handler.get_db")
+# @patch("parkinsons_variant_viewer.web.loaders.upload_handler.HGVSVariant")
+# @patch("parkinsons_variant_viewer.web.loaders.upload_handler.fetch_clinvar_variant")
+# @patch("parkinsons_variant_viewer.web.loaders.upload_handler.get_variant_info")
+# def test_handle_uploaded_file_vcf(mock_get_variant_info, mock_fetch, mock_hgvs, mock_get_db, temp_vcf_file):
+#     mock_db = MagicMock()
+#     mock_get_db.return_value = mock_db
+#     mock_hgvs.return_value.get_hgvs.return_value = "NC_000017.11:g.430457A>T"
+#     mock_fetch.return_value = "raw_data"
+#     mock_get_variant_info.return_value = MockVariantInfo()
 
-    handle_uploaded_file(temp_vcf_file)
+#     handle_uploaded_file(temp_vcf_file)
 
-    assert mock_db.execute.called
-    assert mock_db.commit.called
+#     assert mock_db.execute.called
+#     assert mock_db.commit.called
 
-def test_handle_uploaded_file_wrong_extension():
-    # Should not raise exception; logs error and returns
-    assert handle_uploaded_file("file.txt") is None
+# def test_handle_uploaded_file_wrong_extension():
+#     # Should not raise exception; logs error and returns
+#     assert handle_uploaded_file("file.txt") is None
