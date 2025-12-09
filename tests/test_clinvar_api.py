@@ -3,6 +3,7 @@ from parkinsons_variant_viewer.clinvar_api import (
     fetch_clinvar_variant, 
     get_variant_info, 
     map_review_status_to_stars,
+    fetch_hgnc_id,
     ClinVarApiError
 )
 
@@ -26,7 +27,7 @@ def test_clinvar_api_result():
     assert variant_info.conditions_assoc == "Frontotemporal dementia"
     assert variant_info.transcript == "NM_001377265.1"
     assert variant_info.ref_seq_id == "NC_000017.11"
-    assert variant_info.hgnc_id == "GeneID:4137"
+    assert variant_info.hgnc_id == "HGNC:6893"
     assert variant_info.omim_id == "600274"
     assert variant_info.gene_symbol == "MAPT"
 
@@ -118,4 +119,35 @@ def test_variant_info_has_all_attributes():
     assert hasattr(variant_info, "star_rating")
     assert hasattr(variant_info, "review_status")
     assert hasattr(variant_info, "gene_symbol")
+
+
+def test_fetch_hgnc_id_valid_gene():
+    """Test fetching HGNC ID for a valid gene symbol."""
+    hgnc_id = fetch_hgnc_id("MAPT")
+    assert hgnc_id is not None
+    assert hgnc_id.startswith("HGNC:")
+    assert hgnc_id == "HGNC:6893"
+
+
+def test_fetch_hgnc_id_invalid_gene():
+    """Test fetching HGNC ID for an invalid gene symbol."""
+    hgnc_id = fetch_hgnc_id("INVALID_GENE_XYZ123")
+    assert hgnc_id is None
+
+
+def test_fetch_hgnc_id_empty_string():
+    """Test fetching HGNC ID with empty string."""
+    hgnc_id = fetch_hgnc_id("")
+    assert hgnc_id is None
+
+
+def test_clinvar_with_hgnc_id():
+    """Test that variant info includes HGNC ID when available."""
+    data = fetch_clinvar_variant("NC_000017.11:g.45983420G>T")
+    variant_info = get_variant_info(data)
+    
+    # Should have HGNC ID
+    assert hasattr(variant_info, "hgnc_id")
+    assert variant_info.hgnc_id is not None
+    assert variant_info.hgnc_id.startswith("HGNC:")
             
