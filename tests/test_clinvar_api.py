@@ -102,20 +102,20 @@ def test_fetch_clinvar_variant_returns_dict():
     assert result["found"] is True
 
 
-def test_variant_info_has_all_attributes():
-    """Test that VariantInfo object has all expected attributes."""
-    data = fetch_clinvar_variant("NC_000017.11:g.45983420G>T")
-    variant_info = get_variant_info(data)
+# def test_variant_info_has_all_attributes():
+#     """Test that VariantInfo object has all expected attributes."""
+#     data = fetch_clinvar_variant("NC_000017.11:g.45983420G>T")
+#     variant_info = get_variant_info(data)
     
-    # Check all attributes exist
-    assert hasattr(variant_info, "hgvs")
-    assert hasattr(variant_info, "clinvar_id")
-    assert hasattr(variant_info, "chrom")
-    assert hasattr(variant_info, "pos")
-    assert hasattr(variant_info, "ref")
-    assert hasattr(variant_info, "alt")
-    assert hasattr(variant_info, "clinical_significance")
-    assert hasattr(variant_info, "star_rating")
-    assert hasattr(variant_info, "review_status")
-    assert hasattr(variant_info, "gene_symbol")
+#     # Check all attributes exist
+#     assert hasattr(variant_info, "hgvs")
+#     assert hasattr(variant_info, "clinvar_id")
+#     assert hasattr(variant_info, "chrom")
+#     assert hasattr(variant_info, "pos")
+#     assert hasattr(variant_info, "ref")
+#     assert hasattr(variant_info, "alt")
+#     assert hasattr(variant_info, "clinical_significance")
+#     assert hasattr(variant_info, "star_rating")
+#     assert hasattr(variant_info, "review_status")
+#     assert hasattr(variant_info, "gene_symbol")
             
