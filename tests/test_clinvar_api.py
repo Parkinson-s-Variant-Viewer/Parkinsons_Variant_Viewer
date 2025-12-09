@@ -1,34 +1,35 @@
-# import pytest
-# from parkinsons_variant_viewer.clinvar_api import (
-#     fetch_clinvar_variant, 
-#     get_variant_info, 
-#     map_review_status_to_stars,
-#     ClinVarApiError
-# )
+import pytest
+from parkinsons_variant_viewer.clinvar_api import (
+    fetch_clinvar_variant, 
+    get_variant_info, 
+    map_review_status_to_stars,
+    fetch_hgnc_id,
+    ClinVarApiError
+)
 
 # def test_clinvar_api_result():
 
 #     """Test ClinVar API integration."""
 
 
-#     clinvar_data = fetch_clinvar_variant("NC_000017.11:g.45983420G>T")
-#     variant_info = get_variant_info(clinvar_data)
-#     assert variant_info.chrom == "17"
-#     assert variant_info.pos == "45983420"
-#     assert variant_info.variant_id == "VCV000578075"
-#     assert variant_info.ref == "G"
-#     assert variant_info.alt == "T"
-#     assert variant_info.hgvs == "NC_000017.11:g.45983420G>T"
-#     assert variant_info.clinvar_id == "578075"
-#     assert variant_info.clinical_significance == "Likely benign"
-#     assert variant_info.star_rating == "1"
-#     assert variant_info.review_status == "criteria provided, single submitter"
-#     assert variant_info.conditions_assoc == "Frontotemporal dementia"
-#     assert variant_info.transcript == "NM_001377265.1"
-#     assert variant_info.ref_seq_id == "NC_000017.11"
-#     assert variant_info.hgnc_id == "GeneID:4137"
-#     assert variant_info.omim_id == "600274"
-#     assert variant_info.gene_symbol == "MAPT"
+    clinvar_data = fetch_clinvar_variant("NC_000017.11:g.45983420G>T")
+    variant_info = get_variant_info(clinvar_data)
+    assert variant_info.chrom == "17"
+    assert variant_info.pos == "45983420"
+    assert variant_info.variant_id == "VCV000578075"
+    assert variant_info.ref == "G"
+    assert variant_info.alt == "T"
+    assert variant_info.hgvs == "NC_000017.11:g.45983420G>T"
+    assert variant_info.clinvar_id == "578075"
+    assert variant_info.clinical_significance == "Likely benign"
+    assert variant_info.star_rating == "1"
+    assert variant_info.review_status == "criteria provided, single submitter"
+    assert variant_info.conditions_assoc == "Frontotemporal dementia"
+    assert variant_info.transcript == "NM_001377265.1"
+    assert variant_info.ref_seq_id == "NC_000017.11"
+    assert variant_info.hgnc_id == "HGNC:6893"
+    assert variant_info.omim_id == "600274"
+    assert variant_info.gene_symbol == "MAPT"
 
 
 # def test_map_review_status_to_stars():
@@ -107,15 +108,46 @@
 #     data = fetch_clinvar_variant("NC_000017.11:g.45983420G>T")
 #     variant_info = get_variant_info(data)
     
-#     # Check all attributes exist
-#     assert hasattr(variant_info, "hgvs")
-#     assert hasattr(variant_info, "clinvar_id")
-#     assert hasattr(variant_info, "chrom")
-#     assert hasattr(variant_info, "pos")
-#     assert hasattr(variant_info, "ref")
-#     assert hasattr(variant_info, "alt")
-#     assert hasattr(variant_info, "clinical_significance")
-#     assert hasattr(variant_info, "star_rating")
-#     assert hasattr(variant_info, "review_status")
-#     assert hasattr(variant_info, "gene_symbol")
+    # Check all attributes exist
+    assert hasattr(variant_info, "hgvs")
+    assert hasattr(variant_info, "clinvar_id")
+    assert hasattr(variant_info, "chrom")
+    assert hasattr(variant_info, "pos")
+    assert hasattr(variant_info, "ref")
+    assert hasattr(variant_info, "alt")
+    assert hasattr(variant_info, "clinical_significance")
+    assert hasattr(variant_info, "star_rating")
+    assert hasattr(variant_info, "review_status")
+    assert hasattr(variant_info, "gene_symbol")
+
+
+def test_fetch_hgnc_id_valid_gene():
+    """Test fetching HGNC ID for a valid gene symbol."""
+    hgnc_id = fetch_hgnc_id("MAPT")
+    assert hgnc_id is not None
+    assert hgnc_id.startswith("HGNC:")
+    assert hgnc_id == "HGNC:6893"
+
+
+def test_fetch_hgnc_id_invalid_gene():
+    """Test fetching HGNC ID for an invalid gene symbol."""
+    hgnc_id = fetch_hgnc_id("INVALID_GENE_XYZ123")
+    assert hgnc_id is None
+
+
+def test_fetch_hgnc_id_empty_string():
+    """Test fetching HGNC ID with empty string."""
+    hgnc_id = fetch_hgnc_id("")
+    assert hgnc_id is None
+
+
+def test_clinvar_with_hgnc_id():
+    """Test that variant info includes HGNC ID when available."""
+    data = fetch_clinvar_variant("NC_000017.11:g.45983420G>T")
+    variant_info = get_variant_info(data)
+    
+    # Should have HGNC ID
+    assert hasattr(variant_info, "hgnc_id")
+    assert variant_info.hgnc_id is not None
+    assert variant_info.hgnc_id.startswith("HGNC:")
             
