@@ -1,0 +1,68 @@
+# Installation Guide
+
+This project uses `make` commands to simplify building and running the Parkinson's Variant Viewer application. 
+
+All functionality, including building the Docker image, initiating and resetting the database, and running the web server, is wrapped in the Makefile. 
+
+## Requirements
+- Docker (latest version recommended)
+- GNU Make
+
+---
+## Build the Docker image 
+```bash
+make build
+```
+This command: 
+- Builds the Docker image using the project's Dockerfile
+- Tags the image as parkinsons-viewer
+
+---
+## Initialise the database
+```bash
+make init
+```
+This command runs the `init-db` command to create the SQLite database inside the `instance/` directory. 
+
+Run this command when: 
+- You're setting up the app for the first time
+- You've reset the environment
+- You need a fresh database 
+
+This command will trigger a warning if a database already exists inside `instance/`, and ask you to run `make reset` if you need a fresh database. 
+
+---
+## Reset the database
+```bash
+make reset
+```
+This command completely **deletes and removes** the database located in the `instance/` directory. Use this only when needing a totally clean slate for the database. 
+
+---
+## Annotate the variants in the database
+```bash
+make annotate
+```
+This command runs `run.py annotate` inside the Docker container to load variant information into the database using APIs. 
+
+---
+## Run the web application
+```bash
+make web
+```
+This command starts the Flask web server inside Docker and binds the app to `localhost:5000`
+
+The local `instance/` directory is mounted for persistence. 
+
+Note: If port 5000 is already in use, close the process or adjust the port in the Makefile. 
+
+---
+# Common Workflow 
+To start up the Parkinsons Variant Viewer app and database, run: 
+```bash
+make build
+make init
+make annotate
+make web
+```
+
