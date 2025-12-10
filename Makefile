@@ -17,29 +17,29 @@ build:
 # Initialise the database (safe: refuses if DB exists)
 init:
 	docker run --rm \
-	  -v $(HOST_DB):/app/instance \
+	  -v "$(HOST_DB):/app/instance" \
 	  $(IMAGE) \
 	  init-db
 
 # Reset the database (destructive)
 reset:
 	docker run --rm \
-	  -v $(HOST_DB):/app/instance \
+	  -v "$(HOST_DB):/app/instance" \
 	  $(IMAGE) \
 	  reset-db
 
 # Load VCFs into the DB
 load:
 	docker run --rm \
-	  -v $(HOST_DB):/app/instance \
-	  -v $(HOST_VCF):/app/data/input \
+	  -v "$(HOST_DB):/app/instance" \
+	  -v "$(HOST_VCF):/app/data/input" \
 	  $(IMAGE) \
 	  load-vcfs
 
 # Run annotation pipeline
 annotate:
 	docker run --rm \
-	  -v $(HOST_DB):/app/instance \
+	  -v "$(HOST_DB):/app/instance" \
 	  $(IMAGE) \
 	  annotate
 
@@ -47,7 +47,7 @@ annotate:
 web:
 	docker run \
 	  -p 5000:5000 \
-	  -v $(HOST_DB):/app/instance \
+	  -v "$(HOST_DB):/app/instance" \
 	  $(IMAGE) \
 	  web
 
