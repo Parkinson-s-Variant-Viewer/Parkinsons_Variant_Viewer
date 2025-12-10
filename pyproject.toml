@@ -20,6 +20,10 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
 package-dir = { "" = "src" }
+include-package-data = true
+
+[tool.setuptools.package-data]
+"parkinsons_variant_viewer.web" = ["schema.sql"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
