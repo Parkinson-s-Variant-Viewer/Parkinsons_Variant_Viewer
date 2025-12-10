@@ -85,7 +85,7 @@ This command completely **deletes and removes** the database located in the `ins
 make load
 ```
 
-**Important**: Before running this command, make sure to place your .vcf files in the filepath: Parkinsons_Variant_Viewer/data/input. `make load` looks in this specific location for the patient VCFs. Ensure that the filenames are formatted as "Patient<number>.vcf", where <number> is a numerical value unique to the patient.
+**Important**: Before running this command, make sure to place your .vcf files in the filepath: Parkinsons_Variant_Viewer/data/input. `make load` looks in this specific location for the patient VCFs. Ensure that the filenames are formatted as "Patient[number].vcf", where [number] is a numerical value unique to the patient.
 
 This command loads the VCFs into the database initialised with `make init`.
 
