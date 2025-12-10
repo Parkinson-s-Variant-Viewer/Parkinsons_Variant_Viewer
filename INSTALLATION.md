@@ -62,6 +62,7 @@ To start up the Parkinsons Variant Viewer app and database, run:
 ```bash
 make build
 make init
+make load
 make annotate
 make web
 ```
