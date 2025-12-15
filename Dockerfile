@@ -7,7 +7,7 @@ WORKDIR /app
 # Install system build tools (often needed for scientific/python deps)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
- && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/*
 
 # Copy dependency list and install Python deps
 # If your requirements file has a different name, change this line.
@@ -25,7 +25,8 @@ RUN pip install --no-cache-dir .
 # - data/input: where VCFs are read from
 # - data/output: unused for now but nice to have
 # - src/logs: where your logger writes log files
-RUN mkdir -p instance data/input data/output src/logs
+# - data/uploads: Where uploaded VCFs will be saved 
+RUN mkdir -p instance data/input data/output src/logs data/uploads
 
 # Make Python output unbuffered (nicer logs)
 ENV PYTHONUNBUFFERED=1
