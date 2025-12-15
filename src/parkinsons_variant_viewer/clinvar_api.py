@@ -303,7 +303,7 @@ def map_review_status_to_stars(status):
         return "N/A"
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     # Test
     result = fetch_clinvar_variant("NC_000017.11:g.45983420G>T") # Example HGVS - should return data for all fields 
     info = get_variant_info(result)
