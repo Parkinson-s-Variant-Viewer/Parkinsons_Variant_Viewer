@@ -1,6 +1,6 @@
 # Parkinsons Variant Viewer
 
-[![codecov](https://codecov.io/gh/Parkinson-s-Variant-Viewer/Parkinsons_Variant_Viewer/branch/main/graph/badge.svg)](https://codecov.io/gh/Parkinson-s-Variant-Viewer/Parkinsons_Variant_Viewer)
+[![codecov](https://codecov.io/gh/Parkinson-s-Variant-Viewer/Parkinsons_Variant_Viewer/graph/badge.svg?token=BQCK6G9WUJ)](https://codecov.io/gh/Parkinson-s-Variant-Viewer/Parkinsons_Variant_Viewer)
 
 <img src="docs/images/PVV_logo.png" alt="PVV Logo" width="500">
 
