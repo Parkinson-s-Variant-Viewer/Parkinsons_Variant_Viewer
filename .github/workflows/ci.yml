@@ -5,7 +5,8 @@ on:
     branches:
       - develop-sprint3-ci
       - develop
-      - main 
+      - main
+      - 26-api-tests-failing-in-ci
   pull_request:
     branches:
       - develop-sprint3-ci
