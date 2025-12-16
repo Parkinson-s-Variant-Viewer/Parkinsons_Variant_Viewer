@@ -48,7 +48,7 @@ It aims to enable them to:
 
 **Step 1: Clone the repository**
 ```bash
-git clone git@github.com:patricklahert/Parkinsons_Variant_Viewer.git
+git clone https://github.com/Parkinson-s-Variant-Viewer/Parkinsons_Variant_Viewer.git
 ```
 
 **Step 2: Create the conda environment**
