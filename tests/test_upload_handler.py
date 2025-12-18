@@ -1,81 +1,229 @@
-# tests/test_upload_handler.py
-import os
+import io
+import sqlite3
 import pytest
-import tempfile
-from unittest.mock import patch, MagicMock
-from parkinsons_variant_viewer.web.loaders.upload_handler import handle_uploaded_file
+from unittest.mock import MagicMock, patch
 
-# Mock variant info object returned by get_variant_info
-class MockVariantInfo:
-    hgvs = "NC_000017.11:g.430457A>T"
-    clinvar_id = "12345"
-    clinical_significance = "Pathogenic"
-    star_rating = 2
-    review_status = "criteria provided"
-    conditions_assoc = "Parkinson's disease"
-    transcript = "NM_000000.1"
-    ref_seq_id = "NC_000017.11"
-    hgnc_id = "HGNC:5"
-    omim_id = "123456"
-    gene_symbol = "LRRK2"
-    g_change = "g.430457A>T"
-    c_change = "c.123A>T"
-    p_change = "p.Lys41Asn"
+from parkinsons_variant_viewer.web.loaders.upload_handler import (
+    handle_uploaded_file,
+)
 
-@pytest.fixture
-def temp_csv_file():
-    with tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False) as f:
-        f.write("chrom,pos,ref,alt,patient_id,variant_number,id\n")
-        f.write("17,430457,A,T,101,1,rs123\n")
-        fname = f.name
-    yield fname
-    os.remove(fname)
 
-@pytest.fixture
-def temp_vcf_file():
-    with tempfile.NamedTemporaryFile(mode="w", suffix=".vcf", delete=False) as f:
-        f.write("##fileformat=VCFv4.2\n")
-        f.write("#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\n")
-        f.write("17\t430457\trs123\tA\tT\t.\t.\t.\n")
-        fname = f.name
-    yield fname
-    os.remove(fname)
+class FakeVariantInfo:
+    """Fake object to mimic ClinVar variant info."""
 
-# @patch("parkinsons_variant_viewer.web.loaders.upload_handler.get_db")
-# @patch("parkinsons_variant_viewer.web.loaders.upload_handler.HGVSVariant")
-# @patch("parkinsons_variant_viewer.web.loaders.upload_handler.fetch_clinvar_variant")
-# @patch("parkinsons_variant_viewer.web.loaders.upload_handler.get_variant_info")
-# def test_handle_uploaded_file_csv(mock_get_variant_info, mock_fetch, mock_hgvs, mock_get_db, temp_csv_file):
-#     # Setup mocks
-#     mock_db = MagicMock()
-#     mock_get_db.return_value = mock_db
-#     mock_hgvs.return_value.get_hgvs.return_value = "NC_000017.11:g.430457A>T"
-#     mock_fetch.return_value = "raw_data"
-#     mock_get_variant_info.return_value = MockVariantInfo()
+    def __init__(self):
+        self.hgvs = "chr1:g.123A>T"
+        self.clinvar_id = "12345"
+        self.clinical_significance = "Pathogenic"
+        self.star_rating = 2
+        self.review_status = "criteria provided, single submitter"
+        self.conditions_assoc = "DiseaseX"
+        self.transcript = "NM_000000"
+        self.ref_seq_id = "RefSeq1"
+        self.hgnc_id = 101
+        self.omim_id = 100000
+        self.gene_symbol = "GENE1"
+        self.g_change = "g.123A>T"
+        self.c_change = "c.123A>T"
+        self.p_change = "p.Lys41Asn"
 
-#     # Call function
-#     handle_uploaded_file(temp_csv_file)
 
-#     # Assertions: check DB insert called at least once
-#     assert mock_db.execute.called
-#     assert mock_db.commit.called
+def test_handle_uploaded_file_unsupported_extension():
+    """Unsupported file types should log an error and return None."""
+    fake_file_path = "file.unsupported"
 
-# @patch("parkinsons_variant_viewer.web.loaders.upload_handler.get_db")
-# @patch("parkinsons_variant_viewer.web.loaders.upload_handler.HGVSVariant")
-# @patch("parkinsons_variant_viewer.web.loaders.upload_handler.fetch_clinvar_variant")
-# @patch("parkinsons_variant_viewer.web.loaders.upload_handler.get_variant_info")
-# def test_handle_uploaded_file_vcf(mock_get_variant_info, mock_fetch, mock_hgvs, mock_get_db, temp_vcf_file):
-#     mock_db = MagicMock()
-#     mock_get_db.return_value = mock_db
-#     mock_hgvs.return_value.get_hgvs.return_value = "NC_000017.11:g.430457A>T"
-#     mock_fetch.return_value = "raw_data"
-#     mock_get_variant_info.return_value = MockVariantInfo()
+    with patch(
+        "parkinsons_variant_viewer.web.loaders.upload_handler.logger"
+    ) as mock_logger, patch(
+        "parkinsons_variant_viewer.web.loaders.upload_handler.get_db"
+    ):
+        result = handle_uploaded_file(fake_file_path)
 
-#     handle_uploaded_file(temp_vcf_file)
+    assert result is None
+    mock_logger.error.assert_called()
 
-#     assert mock_db.execute.called
-#     assert mock_db.commit.called
 
-# def test_handle_uploaded_file_wrong_extension():
-#     # Should not raise exception; logs error and returns
-#     assert handle_uploaded_file("file.txt") is None
+def test_handle_uploaded_file_minimal_vcf():
+    """Minimal valid VCF should be parsed and inserted into inputs table."""
+    fake_vcf_content = "# comment line\nchr1\t123\t.\tA\tT\n"
+    fake_file_path = "Patient99.vcf"
+
+    mock_db = MagicMock()
+
+    with patch(
+        "parkinsons_variant_viewer.web.loaders.upload_handler.open",
+        return_value=io.StringIO(fake_vcf_content),
+    ), patch(
+        "parkinsons_variant_viewer.web.loaders.upload_handler.get_db",
+        return_value=mock_db,
+    ), patch(
+        "parkinsons_variant_viewer.web.loaders.upload_handler.logger"
+    ):
+        handle_uploaded_file(fake_file_path)
+
+    assert mock_db.execute.call_count == 1
+    mock_db.commit.assert_called()
+
+    call_args = mock_db.execute.call_args[0][1]
+    assert call_args[0] == 99  # patient_id
+    assert call_args[1] == 1   # variant_number
+    assert call_args[2] == "chr1"
+    assert call_args[3] == 123
+    assert call_args[5] == "A"
+    assert call_args[6] == "T"
+
+
+def test_handle_uploaded_file_vcf_with_hgvs_clinvar():
+    """VCF parsing + HGVS + ClinVar should populate inputs and outputs."""
+    fake_vcf_content = "# comment line\nchr1\t123\t.\tA\tT\n"
+    fake_file_path = "Patient99.vcf"
+
+    mock_db = MagicMock()
+
+    with patch(
+        "parkinsons_variant_viewer.web.loaders.upload_handler.open",
+        return_value=io.StringIO(fake_vcf_content),
+    ), patch(
+        "parkinsons_variant_viewer.web.loaders.upload_handler.get_db",
+        return_value=mock_db,
+    ), patch(
+        "parkinsons_variant_viewer.web.loaders.upload_handler.logger"
+    ) as mock_logger, patch(
+        "parkinsons_variant_viewer.web.loaders.upload_handler.HGVSVariant"
+    ) as mock_hgvs_class, patch(
+        "parkinsons_variant_viewer.web.loaders.upload_handler.fetch_clinvar_variant"
+    ), patch(
+        "parkinsons_variant_viewer.web.loaders.upload_handler.get_variant_info"
+    ) as mock_get_info, patch(
+        "parkinsons_variant_viewer.web.loaders.upload_handler.time.sleep",
+        return_value=None,
+    ):
+        mock_hgvs_instance = mock_hgvs_class.return_value
+        mock_hgvs_instance.get_hgvs.return_value = "chr1:g.123A>T"
+        mock_get_info.return_value = FakeVariantInfo()
+
+        handle_uploaded_file(fake_file_path)
+
+    assert mock_db.execute.call_count >= 2
+    assert mock_db.commit.call_count >= 2
+    mock_logger.error.assert_not_called()
+
+
+def test_handle_uploaded_file_csv_missing_columns():
+    """CSV missing required columns should log an error and stop."""
+    fake_csv_content = "chrom,pos,ref,patient_id\nchr1,123,A,99\n"
+    fake_file_path = "variants.csv"
+
+    mock_db = MagicMock()
+
+    with patch(
+        "parkinsons_variant_viewer.web.loaders.upload_handler.open",
+        return_value=io.StringIO(fake_csv_content),
+    ), patch(
+        "parkinsons_variant_viewer.web.loaders.upload_handler.get_db",
+        return_value=mock_db,
+    ), patch(
+        "parkinsons_variant_viewer.web.loaders.upload_handler.logger"
+    ) as mock_logger:
+        result = handle_uploaded_file(fake_file_path)
+
+    assert result is None
+    mock_logger.error.assert_called()
+    mock_db.execute.assert_not_called()
+    mock_db.commit.assert_not_called()
+
+
+def test_handle_uploaded_file_duplicate_input_entry():
+    """Duplicate DB inserts should be skipped with a warning."""
+    fake_vcf_content = "# comment\nchr1\t123\t.\tA\tT\n"
+    fake_file_path = "Patient99.vcf"
+
+    mock_db = MagicMock()
+    mock_db.execute.side_effect = [
+        sqlite3.IntegrityError("duplicate"),
+    ]
+
+    with patch(
+        "parkinsons_variant_viewer.web.loaders.upload_handler.open",
+        return_value=io.StringIO(fake_vcf_content),
+    ), patch(
+        "parkinsons_variant_viewer.web.loaders.upload_handler.get_db",
+        return_value=mock_db,
+    ), patch(
+        "parkinsons_variant_viewer.web.loaders.upload_handler.logger"
+    ) as mock_logger:
+        handle_uploaded_file(fake_file_path)
+
+    mock_logger.warning.assert_called()
+    mock_db.commit.assert_called()
+
+
+def test_handle_uploaded_file_hgvs_none_skips_output():
+    """If HGVS lookup fails, output insert should be skipped."""
+    fake_vcf_content = "# comment\nchr1\t123\t.\tA\tT\n"
+    fake_file_path = "Patient99.vcf"
+
+    mock_db = MagicMock()
+
+    with patch(
+        "parkinsons_variant_viewer.web.loaders.upload_handler.open",
+        return_value=io.StringIO(fake_vcf_content),
+    ), patch(
+        "parkinsons_variant_viewer.web.loaders.upload_handler.get_db",
+        return_value=mock_db,
+    ), patch(
+        "parkinsons_variant_viewer.web.loaders.upload_handler.HGVSVariant"
+    ) as mock_hgvs_class, patch(
+        "parkinsons_variant_viewer.web.loaders.upload_handler.logger"
+    ) as mock_logger:
+        mock_hgvs_class.return_value.get_hgvs.return_value = None
+
+        handle_uploaded_file(fake_file_path)
+
+    mock_logger.warning.assert_called()
+    assert mock_db.execute.call_count == 1  # inputs only
+
+
+def test_handle_uploaded_file_invalid_vcf_line():
+    """Invalid VCF format should log error and stop."""
+    fake_vcf_content = "chr1\t123\tA\n"  # too few columns
+    fake_file_path = "Patient99.vcf"
+
+    mock_db = MagicMock()
+
+    with patch(
+        "parkinsons_variant_viewer.web.loaders.upload_handler.open",
+        return_value=io.StringIO(fake_vcf_content),
+    ), patch(
+        "parkinsons_variant_viewer.web.loaders.upload_handler.get_db",
+        return_value=mock_db,
+    ), patch(
+        "parkinsons_variant_viewer.web.loaders.upload_handler.logger"
+    ) as mock_logger:
+        result = handle_uploaded_file(fake_file_path)
+
+    assert result is None
+    mock_logger.error.assert_called()
+    mock_db.execute.assert_not_called()
+
+
+def test_handle_uploaded_file_invalid_patient_id():
+    """VCF filename without patient ID should error."""
+    fake_vcf_content = "# comment\nchr1\t123\t.\tA\tT\n"
+    fake_file_path = "sample.vcf"
+
+    mock_db = MagicMock()
+
+    with patch(
+        "parkinsons_variant_viewer.web.loaders.upload_handler.open",
+        return_value=io.StringIO(fake_vcf_content),
+    ), patch(
+        "parkinsons_variant_viewer.web.loaders.upload_handler.get_db",
+        return_value=mock_db,
+    ), patch(
+        "parkinsons_variant_viewer.web.loaders.upload_handler.logger"
+    ) as mock_logger:
+        result = handle_uploaded_file(fake_file_path)
+
+    assert result is None
+    mock_logger.error.assert_called()
