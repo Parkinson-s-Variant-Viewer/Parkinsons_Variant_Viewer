@@ -3,6 +3,8 @@ from .db import close_db
 
 def create_app():
     app = Flask(__name__)
+
+    # Database lives in root-level instance folder
     app.config['DATABASE'] = 'instance/parkinsons.db'
 
     # Import and register routes
