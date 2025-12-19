@@ -1,7 +1,7 @@
 # Makefile for Parkinsons Variant Viewer (Windows + Linux safe)
 
 IMAGE = parkinsons-viewer
-DB_DIR = parkinsons-data/instance
+DB_DIR = instance
 VCF_DIR = data/input
 LOG_DIR = src/logs
 

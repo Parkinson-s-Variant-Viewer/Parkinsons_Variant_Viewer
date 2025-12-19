@@ -4,6 +4,8 @@ from parkinsons_variant_viewer.utils.logger import logger
 
 def create_app():
     app = Flask(__name__)
+
+    # Database lives in root-level instance folder
     app.config['DATABASE'] = 'instance/parkinsons.db'
     
     logger.info("Starting Parkinsons Variant Viewer application")
