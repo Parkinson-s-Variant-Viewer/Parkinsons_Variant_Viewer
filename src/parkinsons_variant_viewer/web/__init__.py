@@ -1,13 +1,18 @@
 from flask import Flask
 from .db import close_db
+from parkinsons_variant_viewer.utils.logger import logger
 
 def create_app():
     app = Flask(__name__)
     app.config['DATABASE'] = 'instance/parkinsons.db'
+    
+    logger.info("Starting Parkinsons Variant Viewer application")
+    logger.info(f"Database location: {app.config['DATABASE']}")
 
     # Import and register routes
     from .routes import bp
     app.register_blueprint(bp)
+    logger.info("Routes registered successfully")
 
     # Close DB connection on teardown
     app.teardown_appcontext(close_db)
