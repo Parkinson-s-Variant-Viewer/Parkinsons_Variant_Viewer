@@ -3,10 +3,12 @@
 IMAGE = parkinsons-viewer
 DB_DIR = parkinsons-data/instance
 VCF_DIR = data/input
+LOG_DIR = src/logs
 
 # Convert Windows backslashes to forward slashes for Docker
 HOST_DB = $(subst \,/,$(CURDIR)/$(DB_DIR))
 HOST_VCF = $(subst \,/,$(CURDIR)/$(VCF_DIR))
+HOST_LOG = $(subst \,/,$(CURDIR)/$(LOG_DIR))
 
 .PHONY: build init reset load annotate web fresh
 
@@ -40,6 +42,7 @@ load:
 annotate:
 	docker run --rm \
 	  -v "$(HOST_DB):/app/instance" \
+	  -v "$(HOST_LOG):/app/src/logs" \
 	  $(IMAGE) \
 	  annotate
 
@@ -48,6 +51,7 @@ web:
 	docker run \
 	  -p 5000:5000 \
 	  -v "$(HOST_DB):/app/instance" \
+	  -v "$(HOST_LOG):/app/src/logs" \
 	  $(IMAGE) \
 	  web
 
