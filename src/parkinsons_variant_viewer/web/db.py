@@ -1,4 +1,5 @@
 import sqlite3
+from pathlib import Path
 from flask import g, current_app
 
 # Return an open database connection (cached per request)
@@ -19,13 +20,23 @@ def close_db(e=None):
 
 # Initialise the database using schema.sql 
 def init_db():
+    # Ensure instance folder exists
+    db_path = Path(current_app.config['DATABASE'])
+    db_path.parent.mkdir(parents=True, exist_ok=True)
+
     db = get_db()
-    with current_app.open_resource('schema.sql') as f: 
-        db.executescript(f.read().decode('utf8'))
+
+    # Schema file relative to Flask app
+    schema_path = Path(current_app.root_path) / 'schema.sql'
+    if not schema_path.exists():
+        raise FileNotFoundError(f"Cannot find {schema_path}")
+
+    with open(schema_path, 'r', encoding='utf-8') as f:
+        db.executescript(f.read())
 
 # Helper so loader can get DB path
 def get_db_path(): 
     """
     Return the absolute path to the SQLite database file.
     """
-    return current_app.config['DATABASE']
+    return str(Path(current_app.config['DATABASE']).resolve())
