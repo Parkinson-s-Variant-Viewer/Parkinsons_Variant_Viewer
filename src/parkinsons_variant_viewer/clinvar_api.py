@@ -2,10 +2,7 @@ import requests
 import xmltodict
 import logging
 import re
-
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+from parkinsons_variant_viewer.utils.logger import logger
 
 """Module to interact with ClinVar API and extract variant information. Queries ClinVar with HGVS nomenclature using esearch and returns the ClinVar ID.
 Uses the ClinVar ID to query efetch and esummary endpoints to extract detailed variant information."""
