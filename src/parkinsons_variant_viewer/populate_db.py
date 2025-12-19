@@ -79,10 +79,10 @@ def populate_database():
                     variant_info.p_change
                 ))
                 conn.commit()
-                logger.info(f"✅ Added ClinVar data for Patient {patient_id}, Variant {variant_number}")
+                logger.info(f"Added ClinVar data for Patient {patient_id}, Variant {variant_number}")
 
             except Exception as e:
-                logger.error(f"❌ Error processing Patient {patient_id}, Variant {variant_number}: {e}")
+                logger.error(f"Error processing Patient {patient_id}, Variant {variant_number}: {e}")
 
             # Respect API rate limits
             time.sleep(0.5)
