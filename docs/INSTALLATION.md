@@ -1,5 +1,9 @@
 # Installation Guide
 
+<img src="docs/images/PVV_logo.png" alt="PVV Logo" width="500">
+
+---
+
 This guide outlines the installation process for both local and Dockerised installation of the Parkinsons Variant Viewer software.
 
 ## Local Installation Guide

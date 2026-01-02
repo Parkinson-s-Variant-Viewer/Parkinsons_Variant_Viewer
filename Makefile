@@ -1,4 +1,5 @@
-# Makefile for Parkinsons Variant Viewer (Windows + Linux safe)
+# Makefile for Parkinsons Variant Viewer 
+# Windows + Linux compatible
 
 IMAGE = parkinsons-viewer
 DB_DIR = instance

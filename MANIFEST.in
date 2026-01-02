@@ -1,6 +1,6 @@
 # Include the README and license files
 include README.md
-# include LICENSE
+include LICENSE.txt
 
 # Include the SQL schema in the package
 include src/parkinsons_variant_viewer/web/schema.sql
