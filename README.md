@@ -44,6 +44,9 @@ It aims to enable them to:
 
 ## 🚀 Installation
 
+See basic local installation below. For Dockerised install and more details, see 
+docs/INSTALLATION.md 
+
 ---
 
 **Step 1: Clone the repository**
@@ -73,7 +76,7 @@ For detailed installation instructions, see `Installation_manual.md`
 
 ---
 
-See User_manual.md
+See docs/USER_MANUAL.md
 
 ## 👥 Authors
 
@@ -82,6 +85,11 @@ See User_manual.md
 - **Ruqayyah Peerbhai**
 - **Rebekah Embers**
 - **Patrick Lahert** 
+
+AI-assisted development: ChatGPT (version 5.1) and GitHub Copilot were used as 
+assistive tools during development for code suggestions, refactoring, and 
+documentation; all final design decisions and implementations were made by the 
+authors.
 
 ## 📄 License
 
