@@ -1,10 +1,15 @@
-# logger.py
+"""
+Logging configuration for the Parkinsons Variant Viewer project.
+
+This module provides a helper function for creating a configured logger
+with both console output and rotating file logs, suitable for use in
+development and Docker environments.
+"""
 import logging
+import os
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
-
-# Create a logger instance
 def create_logger(level=logging.INFO):
     """
     Create and configure a rotating file logger for the
@@ -24,7 +29,6 @@ def create_logger(level=logging.INFO):
 
     # Use absolute path for logs directory (works in Docker and development)
     # Try /app/src/logs first (Docker), fall back to local src/logs
-    import os
     if os.path.exists('/app/src/logs'):
         log_dir = Path('/app/src/logs')
     else:
@@ -67,7 +71,6 @@ def create_logger(level=logging.INFO):
     logger.addHandler(file_handler)
 
     return logger
-
 
 # Instantiate the logger
 logger = create_logger()

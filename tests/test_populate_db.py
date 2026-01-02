@@ -1,11 +1,9 @@
+"""Tests for populate_db.py module."""
+from flask import Flask
+import pytest
+import sqlite3
 import sys
 import types
-import sqlite3
-from pathlib import Path
-
-import pytest
-from flask import Flask
-
 
 @pytest.fixture
 def temp_db(tmp_path):

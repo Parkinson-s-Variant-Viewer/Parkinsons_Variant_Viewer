@@ -1,17 +1,39 @@
+"""
+Populate the `outputs` table in the Parkinsons Variant Viewer database.
+
+Fetches HGVS notation for variants in the `inputs` table, queries ClinVar
+for detailed information, and inserts or updates the `outputs` table.
+"""
+
 import sqlite3
 import time
+
 from parkinsons_variant_viewer.hgvs_variant import HGVSVariant
 from parkinsons_variant_viewer.clinvar_api import fetch_clinvar_variant, get_variant_info
 from parkinsons_variant_viewer.web import create_app
 from parkinsons_variant_viewer.web.db import get_db_path
 from parkinsons_variant_viewer.utils.logger import logger
 
-
 def populate_database():
     """
-    Populate the outputs table for all variants in the inputs table.
-    Intended to be called programmatically (e.g. from run.py).
+    Populate the `outputs` table with ClinVar data for all variants in the 
+    `inputs` table.
+
+    Fetches HGVS notation for each variant using `HGVSVariant`, queries ClinVar 
+    for detailed variant information, and inserts or updates the `outputs` table 
+    in the database. Designed to be called programmatically (e.g., from `run.py`).
+
+    Notes
+    -----
+    - Skips variants for which no HGVS notation is found.
+    - Respects API rate limits by pausing between queries.
+    - Logs progress, warnings, and errors using the project logger.
+
+    Returns
+    -------
+    None
     """
+
     app = create_app()
 
     with app.app_context():
@@ -88,8 +110,8 @@ def populate_database():
             time.sleep(0.5)
 
         conn.close()
-        logger.info("🎉 Database population complete.")
+        logger.info("Database population complete.")
 
 
-if __name__ == "__main__":
+if __name__ == "__main__": # pragma: no cover
     populate_database()

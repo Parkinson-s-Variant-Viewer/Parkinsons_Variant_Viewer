@@ -1,14 +1,32 @@
+"""
+Flask routes for the Parkinson's Variant Viewer web app.
+
+Provides endpoints for viewing variants, adding new variants, and
+uploading variant files. Handles rendering templates and database
+interactions.
+"""
+
 from flask import Blueprint, render_template, request, redirect, url_for
 from .db import get_db
+
 from parkinsons_variant_viewer.utils.logger import logger
 
 bp = Blueprint("web", __name__)
 
-
-# Home page: list all variants (input + output if present)
 @bp.route("/")
-def index():  # pragma: no cover
-    logger.debug("Index page accessed")  # pragma: no cover
+def index():
+    """
+    Display the home page with a list of all variants.
+
+    Joins the `inputs` and `outputs` tables and displays both
+    manually added and ClinVar-fetched variant data.
+
+    Returns
+    -------
+    str
+        Rendered HTML template for the index page.
+    """
+    logger.debug("Index page accessed")
     db = get_db()
 
     # Join the inputs and outputs tables on the composite key
@@ -42,17 +60,27 @@ def index():  # pragma: no cover
         ORDER BY i.patient_id, i.variant_number
     """).fetchall()
     
-    logger.info(f"Displaying {len(rows)} variants on index page")  # pragma: no cover
+    logger.info(f"Displaying {len(rows)} variants on index page")
     return render_template("variants.html", variants=rows)
 
-
-# Add a new *input* variant manually
 @bp.route("/add", methods=["GET", "POST"])
-def add_variant():  # pragma: no cover
+def add_variant():
+    """
+    Add a new input variant manually via a form.
+
+    GET requests render the form. POST requests insert the submitted
+    variant into the `inputs` table.
+
+    Returns
+    -------
+    str
+        Redirects to the index page after a successful POST, or renders
+        the add variant form for GET requests.
+    """
     db = get_db()
 
     if request.method == "POST":
-        logger.info("Received POST request to add new variant")  # pragma: no cover
+        logger.info("Received POST request to add new variant")
         patient_id = request.form["patient_id"]
         variant_number = request.form["variant_number"]
         chrom = request.form["chrom"]
@@ -71,17 +99,23 @@ def add_variant():  # pragma: no cover
         )
 
         db.commit()
-        logger.info(f"Added variant: Patient {patient_id}, Variant {variant_number}, {chrom}:{pos} {ref}>{alt}")  # pragma: no cover
+        logger.info(f"Added variant: Patient {patient_id}, Variant {variant_number}, {chrom}:{pos} {ref}>{alt}")
         return redirect(url_for("web.index"))
     
-    logger.debug("Add variant form accessed (GET)")  # pragma: no cover
+    logger.debug("Add variant form accessed (GET)")
     return render_template("add_variant.html")
 
-
-# Route to view the table of input data
 @bp.route("/inputs")
-def view_inputs():  # pragma: no cover
-    logger.debug("Inputs page accessed")  # pragma: no cover
+def view_inputs():
+    """
+    Display a table of manually added input variants.
+
+    Returns
+    -------
+    str
+        Rendered HTML template showing all entries in the `inputs` table.
+    """
+    logger.debug("Inputs page accessed")
     db = get_db()
 
     rows = db.execute("""
@@ -90,34 +124,47 @@ def view_inputs():  # pragma: no cover
         ORDER BY patient_id, variant_number
     """).fetchall()
     
-    logger.info(f"Displaying {len(rows)} input variants")  # pragma: no cover
+    logger.info(f"Displaying {len(rows)} input variants")
     return render_template("inputs.html", inputs=rows)
 
-
-# Route to handle AJAX file upload from main page
 @bp.route("/upload", methods=["POST"])
-def upload_data():  # pragma: no cover
-    logger.info("File upload request received")  # pragma: no cover
+def upload_data():
+    """
+    Handle file uploads via AJAX and process them.
+
+    Saves the uploaded file to `data/uploads`, then calls the
+    `handle_uploaded_file` function to insert variants into the database
+    and fetch ClinVar data.
+
+    Returns
+    -------
+    tuple
+        Response message and HTTP status code.
+        - 200: Success
+        - 400: No file provided
+        - 500: Processing error
+    """
+    logger.info("File upload request received")
     
     file = request.files.get("file")
     if not file:
-        logger.warning("Upload failed: No file provided in request")  # pragma: no cover
+        logger.warning("Upload failed: No file provided in request")
         return "No file uploaded", 400
 
     filename = file.filename
-    logger.info(f"Processing uploaded file: {filename}")  # pragma: no cover
+    logger.info(f"Processing uploaded file: {filename}")
     
     try:
         save_path = f"data/uploads/{filename}"  # ensure this folder exists
         file.save(save_path)
-        logger.info(f"File saved to: {save_path}")  # pragma: no cover
+        logger.info(f"File saved to: {save_path}")
 
         # Call handler to insert into DB and fetch ClinVar
         from .loaders.upload_handler import handle_uploaded_file
         handle_uploaded_file(save_path)
         
-        logger.info(f"Successfully processed file: {filename}")  # pragma: no cover
+        logger.info(f"Successfully processed file: {filename}")
         return "OK", 200
     except Exception as e:
-        logger.error(f"Error processing uploaded file {filename}: {e}", exc_info=True)  # pragma: no cover
+        logger.error(f"Error processing uploaded file {filename}: {e}", exc_info=True)
         return f"Error processing file: {str(e)}", 500

@@ -1,5 +1,7 @@
+"""Tests for hgvs_variant.py module."""
 import pytest
 import requests
+
 from parkinsons_variant_viewer.hgvs_variant import HGVSVariant
 
 # Initialisation tests
@@ -157,18 +159,14 @@ def test_query_lovd_calls_sleep(monkeypatch):
 
     assert sleep_calls == [0.25]
 
+# Forthcoming tests 
 # Tests for JSON parsing 
-
-
 
 # Tests for MANE transcript extraction 
 
-
 # Tests for get_hgvs()
 
-
 # Integration testing 
-
 
 # Testing edge cases 
 

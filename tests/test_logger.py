@@ -1,3 +1,4 @@
+"""Tests for logger.py module."""
 import logging
 from unittest.mock import patch, MagicMock
 from pathlib import Path

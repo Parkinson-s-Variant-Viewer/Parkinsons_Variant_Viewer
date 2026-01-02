@@ -1,3 +1,4 @@
+"""Tests for db.py module."""
 import pytest
 from unittest.mock import patch, MagicMock, mock_open
 from pathlib import Path

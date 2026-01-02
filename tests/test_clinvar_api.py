@@ -4,8 +4,10 @@ Tests for ClinVar API module.
 All tests use mocked API responses to avoid hitting rate limits and ensure
 fast, reliable test execution in CI/CD pipelines.
 """
+
 import pytest
 from unittest.mock import patch, Mock
+
 from parkinsons_variant_viewer.clinvar_api import (
     fetch_clinvar_variant, 
     get_variant_info, 
