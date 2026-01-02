@@ -1,6 +1,6 @@
 # Parkinsons Variant Viewer – User Manual
 
-<img src="docs/images/PVV_logo.png" alt="PVV Logo" width="500">
+<img src="images/PVV_logo.png" alt="PVV Logo" width="500">
 
 ---
 
