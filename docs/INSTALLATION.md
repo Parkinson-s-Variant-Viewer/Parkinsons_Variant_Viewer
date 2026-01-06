@@ -13,21 +13,24 @@ This guide outlines the installation process for both local and Dockerised insta
 ```bash
 git clone git@github.com:patricklahert/Parkinsons_Variant_Viewer.git
 ```
-
-#### Step 2: Create the conda environment
+#### Step 2: Change directory
+```bash
+cd Parkinsons_Variant_Viewer
+```
+#### Step 3: Create the conda environment
 
 ```bash
 conda env create -f environment.yml
 conda activate pvv_conda
 ```
 
-#### Step 3: Install requirements
+#### Step 4: Install requirements
 
 ```bash
 pip install -r requirements.txt
 ```
 
-#### Step 4: Install Parkinsons Variant Viewer
+#### Step 5: Install Parkinsons Variant Viewer
 
 ```bash
 python -m pip install -e .
