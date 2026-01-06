@@ -1,15 +1,21 @@
-# run.py
-import sys
+"""
+Command-line entry point for the Parkinson's Variant Viewer application.
+
+This script provides commands for running the web application, initialising
+and resetting the database, loading VCF files, and running the annotation
+pipeline.
+"""
+
 import os
+import sys
 
 from parkinsons_variant_viewer.web import create_app
 from parkinsons_variant_viewer.web.db import init_db, get_db_path
 from parkinsons_variant_viewer.web.loaders.vcf_loader import load_vcf_into_db
 from parkinsons_variant_viewer.populate_db import populate_database
 
-
 def main():
-    # Print out the help menu describing usage of run.py when arguments are not specified. 
+    """Parse command-line arguments and dispatch application commands."""
     if len(sys.argv) < 2:
         print("Usage: python run.py [web | init-db | reset-db | load-vcfs | annotate]")
         sys.exit(1)
@@ -85,5 +91,5 @@ def main():
         print("Usage: python run.py [web | init-db | load-vcfs | annotate]")
 
 
-if __name__ == "__main__":
+if __name__ == "__main__": # pragma: no cover
     main()

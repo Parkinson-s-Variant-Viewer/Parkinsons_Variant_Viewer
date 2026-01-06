@@ -1,7 +1,9 @@
-import pytest
-from unittest.mock import patch
+"""Tests for routes.py module."""
 from flask import Flask
 from io import BytesIO
+import pytest
+from unittest.mock import patch
+
 from parkinsons_variant_viewer.web.routes import bp
 
 @pytest.fixture

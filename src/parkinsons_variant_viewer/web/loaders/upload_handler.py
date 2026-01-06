@@ -1,25 +1,50 @@
+"""
+Handle uploaded VCF and CSV files for the Parkinsons Variant Viewer.
+
+This module parses uploaded variant files, inserts input variants into
+the database, retrieves HGVS identifiers, queries ClinVar for annotation
+data, and populates the outputs table.
+"""
+
 import os
 import csv
-import sqlite3  #*** added for catching IntegrityError
+import sqlite3
+import time
+
 from ..db import get_db
 from parkinsons_variant_viewer.hgvs_variant import HGVSVariant
 from parkinsons_variant_viewer.clinvar_api import fetch_clinvar_variant, get_variant_info
 from parkinsons_variant_viewer.utils.logger import logger
-import time
-
 
 def handle_uploaded_file(file_path):
     """
-    Handle VCF or CSV upload, parse variants, insert into DB,
-    fetch HGVS IDs, call ClinVar API, and populate outputs table.
+    Process an uploaded VCF or CSV file and populate variant tables.
+
+    This function parses an uploaded variant file, inserts variant records
+    into the inputs table, retrieves HGVS identifiers, queries the ClinVar
+    API for annotation data, and stores annotated results in the outputs
+    table. Errors encountered during parsing or external API calls are
+    logged and do not halt processing of subsequent variants.
+
+    Parameters
+    ----------
+    file_path : str
+        Path to the uploaded VCF or CSV file to be processed.
+
+    Returns
+    -------
+    None
+        This function does not return a value. All results are written to
+        the database and progress or errors are logged.
     """
+
     _, ext = os.path.splitext(file_path)
     ext = ext.lower()
     db = get_db()
     variants = []
 
     # --- Parse uploaded file with exception handling ---
-    try:  #*** added
+    try:
         if ext == ".vcf":
             # Extract patient_id from filename like Patient99.vcf
             stem = os.path.basename(file_path).split(".")[0]
@@ -35,7 +60,7 @@ def handle_uploaded_file(file_path):
                         continue
                     parts = line.strip().split("\t")
                     if len(parts) < 5:
-                        raise ValueError(f"Invalid VCF line format: {line}")  #***
+                        raise ValueError(f"Invalid VCF line format: {line}")
                     chrom, pos, vid, ref, alt = parts[:5]
                     variants.append({
                         "chrom": chrom,
@@ -44,7 +69,7 @@ def handle_uploaded_file(file_path):
                         "alt": alt,
                         "variant_number": variant_number,
                         "patient_id": patient_id,
-                        "id": vid
+                        "id": vid,
                     })
                     variant_number += 1
 
@@ -52,8 +77,11 @@ def handle_uploaded_file(file_path):
             with open(file_path, newline="") as f:
                 reader = csv.DictReader(f)
                 for row in reader:
-                    if not all(k in row for k in ["chrom", "pos", "ref", "alt", "patient_id", "variant_number"]):
-                        raise ValueError(f"CSV missing required columns: {row}")  #***
+                    if not all(
+                        k in row 
+                        for k in ["chrom", "pos", "ref", "alt", "patient_id", "variant_number"]
+                    ):
+                        raise ValueError(f"CSV missing required columns: {row}")
                     variants.append({
                         "chrom": row["chrom"],
                         "pos": int(row["pos"]),
@@ -64,15 +92,15 @@ def handle_uploaded_file(file_path):
                         "id": row.get("id")
                     })
         else:
-            raise ValueError("Unsupported file type")  #*** catches wrong extension
+            raise ValueError("Unsupported file type")  # catches wrong extension
 
-    except Exception as e:  #*** catch parsing/file type errors
+    except Exception as e:  # catch parsing/file type errors
         logger.error(f"Error parsing uploaded file: {e}")
         return  # stop further processing
 
     # --- Insert into inputs table with duplicate handling ---
     for var in variants:
-        try:  #*** added
+        try:
             db.execute(
                 """
                 INSERT INTO inputs (patient_id, variant_number, chrom, pos, id, ref, alt)
@@ -88,7 +116,7 @@ def handle_uploaded_file(file_path):
                     var["alt"],
                 ),
             )
-        except sqlite3.IntegrityError as e:  #*** catch duplicates
+        except sqlite3.IntegrityError as e:  # catch duplicates
             logger.warning(f"Duplicate entry for Patient {var['patient_id']}, Variant {var['variant_number']}: {e}")
             continue  # skip duplicate
 

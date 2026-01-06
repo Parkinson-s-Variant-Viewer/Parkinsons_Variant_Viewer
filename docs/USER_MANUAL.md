@@ -1,4 +1,6 @@
-# (need to add PVV logo) Parkinsons Variant Viewer – User Manual
+# Parkinsons Variant Viewer – User Manual
+
+<img src="images/PVV_logo.png" alt="PVV Logo" width="500">
 
 ---
 

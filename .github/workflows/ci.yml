@@ -3,14 +3,10 @@ name: CI
 on:
   push:
     branches:
-      - develop-sprint3-ci
       - develop
       - main
-      - 26-api-tests-failing-in-ci
-      - rn-sprint3
   pull_request:
     branches:
-      - develop-sprint3-ci
       - develop
       - main 
 

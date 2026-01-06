@@ -1,8 +1,9 @@
-import pytest
+"""Tests for web.py module."""
+from flask import Flask
+
 from parkinsons_variant_viewer.web import create_app
 from parkinsons_variant_viewer.web.routes import bp
 from parkinsons_variant_viewer.web.db import close_db
-from flask import Flask
 
 def test_create_app():
     """Test that create_app sets up the Flask app correctly."""

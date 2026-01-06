@@ -1,14 +1,36 @@
+"""
+VCF loader for Parkinsons Variant Viewer.
+
+Provides a function to parse single-patient VCF files, extract variants,
+and insert them into the database while skipping duplicates.
+"""
+
 import sqlite3
 from pathlib import Path
-from parkinsons_variant_viewer.utils.logger import logger
 
+from parkinsons_variant_viewer.utils.logger import logger
 
 def load_vcf_into_db(vcf_path, db_path):
     """
-    Parse a VCF for a single patient and insert variants into the `inputs` table.
-    - Patient ID is extracted from filenames like Patient1.vcf
-    - Variant numbers start at 1 for each file
-    - Existing variants are skipped to avoid duplicates
+    Load variants from a VCF file into the database.
+
+    This function parses a VCF file for a single patient, extracts
+    variant information, and inserts it into the `inputs` table. Patient
+    IDs are inferred from filenames like 'Patient1.vcf'. Variant numbers
+    start at 1 for each file, and existing variants are skipped to
+    prevent duplicates.
+
+    Parameters
+    ----------
+    vcf_path : str or Path
+        Path to the VCF file to be loaded.
+    db_path : str or Path
+        Path to the SQLite database file.
+
+    Returns
+    -------
+    None
+        Results are written to the database and progress is logged.
     """
 
     stem = Path(vcf_path).stem
@@ -60,7 +82,7 @@ def load_vcf_into_db(vcf_path, db_path):
                 INSERT INTO inputs
                 (patient_id, variant_number, chrom, pos, id, ref, alt)
                 VALUES (?, ?, ?, ?, ?, ?, ?)
-            """, (patient_id, variant_number, chrom, pos, vid, ref, alt))
+            """, (patient_id, variant_number, chrom, pos, vid, ref, alt,))
 
             inserted_count += 1
             variant_number += 1

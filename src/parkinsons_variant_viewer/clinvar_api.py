@@ -1,20 +1,38 @@
+"""
+ClinVar API interaction module for Parkinsons Variant Viewer.
+
+Provides functions to query ClinVar using HGVS nomenclature and extract
+variant information. Supports fetching ClinVar IDs via esearch, retrieving
+detailed variant records via efetch and esummary, and mapping review
+statuses to star ratings. Also includes a helper to fetch HGNC IDs from
+gene symbols.
+"""
+
+import re
 import requests
 import xmltodict
-import logging
-import re
+
 from parkinsons_variant_viewer.utils.logger import logger
-
-"""Module to interact with ClinVar API and extract variant information. Queries ClinVar with HGVS nomenclature using esearch and returns the ClinVar ID.
-Uses the ClinVar ID to query efetch and esummary endpoints to extract detailed variant information."""
-
-
 
 class ClinVarApiError(Exception):
     """Custom exception for ClinVar API errors."""
     pass
     
 def fetch_hgnc_id(gene_symbol):
-    """Fetch HGNC ID from gene symbol using HGNC API."""
+    """
+    Fetch HGNC ID for a given gene symbol using the HGNC REST API.
+
+    Parameters
+    ----------
+    gene_symbol : str
+        Gene symbol to query (e.g., "LRRK2").
+
+    Returns
+    -------
+    str or None
+        HGNC ID in the format "HGNC:XXXX", or None if not found.
+    """
+
     try:
         url = f"https://rest.genenames.org/fetch/symbol/{gene_symbol}"
         headers = {'Accept': 'application/json'}
@@ -35,7 +53,33 @@ def fetch_hgnc_id(gene_symbol):
     return None
 
 def fetch_clinvar_variant(hgvs):
-    """Fetch ClinVar data for HGVS variant."""
+    """
+    Query ClinVar for a given HGVS variant and return XML-parsed data.
+
+    The function searches ClinVar using the esearch endpoint, retrieves
+    variant IDs, and fetches detailed variant data with efetch and esummary.
+
+    Parameters
+    ----------
+    hgvs : str
+        HGVS-formatted variant string (e.g., "NC_000017.11:g.45983420G>T").
+
+    Returns
+    -------
+    dict
+        Dictionary containing:
+        - 'variant': Parsed efetch XML data
+        - 'summary': Parsed esummary XML data
+        - 'hgvs': Original HGVS string
+        - 'found': True if variant found, else False
+        - 'clinvar_id': ClinVar ID if found, else None
+
+    Raises
+    ------
+    ClinVarApiError
+        If a request to the ClinVar API fails.
+    """
+
     # Search for variant
     search_url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi"
     search_params = {"db": "clinvar", "term": f'"{hgvs}"[variant name]', "retmode": "xml"}
@@ -81,10 +125,71 @@ def fetch_clinvar_variant(hgvs):
         raise ClinVarApiError(f"Failed to fetch ClinVar data: {e}")
 
 def get_variant_info(data):
-    """Extract variant information from ClinVar data."""
+    """
+    Parse ClinVar API response into a structured VariantInfo object.
+
+    Converts the raw XML-parsed ClinVar response into a VariantInfo object
+    with attributes such as HGVS, ClinVar ID, clinical significance,
+    star rating, transcript, reference/alternate alleles, and gene info.
+    If the variant is not found, default values are returned.
+
+    Parameters
+    ----------
+    data : dict
+        Dictionary returned by `fetch_clinvar_variant`.
+
+    Returns
+    -------
+    VariantInfo
+        An object containing variant annotations and genomic details.
+    """
     
     class VariantInfo:
-        """Store variant information from ClinVar."""
+        """
+        Stores variant information extracted from ClinVar data.
+
+        Attributes
+        ----------
+        hgvs : str
+            HGVS nomenclature for the variant (e.g., "NC_000017.11:g.45983420G>T").
+        clinvar_id : str
+            ClinVar ID associated with the variant.
+        variant_id : str
+            Identifier for the variant; usually same as ClinVar ID.
+        chrom : str
+            Chromosome where the variant is located.
+        pos : str or int
+            Position of the variant on the chromosome (1-based).
+        ref : str
+            Reference allele.
+        alt : str
+            Alternate allele.
+        clinical_significance : str
+            ClinVar clinical significance classification.
+        star_rating : str
+            ClinVar review star rating (0-4 or N/A).
+        review_status : str
+            ClinVar review status description.
+        conditions_assoc : str
+            Associated conditions/phenotypes from ClinVar.
+        transcript : str
+            Transcript ID or name associated with the variant.
+        ref_seq_id : str
+            Reference sequence ID from ClinVar SPDI data.
+        g_change : str
+            Genomic HGVS change (g.) notation.
+        c_change : str
+            Coding DNA HGVS change (c.) notation.
+        p_change : str
+            Protein HGVS change (p.) notation.
+        hgnc_id : str
+            HGNC ID for the associated gene, if available.
+        omim_id : str
+            OMIM ID for associated conditions, if available.
+        gene_symbol : str
+            Gene symbol (e.g., "LRRK2").
+        """
+
         def __init__(self, **kwargs):
             self.hgvs = kwargs.get('hgvs')
             self.clinvar_id = kwargs.get('clinvar_id')
@@ -107,7 +212,7 @@ def get_variant_info(data):
             self.gene_symbol = kwargs.get('gene_symbol')
             
         def to_dict(self):
-            """Convert to dictionary for CSV export."""
+            """Convert variant information to dictionary for CSV export."""
             return {
                 'CHROM': self.chrom,
                 'POS': self.pos,
@@ -281,7 +386,20 @@ def get_variant_info(data):
 
 
 def map_review_status_to_stars(status):
-    """Map ClinVar review status to star rating."""
+    """
+    Map a ClinVar review status string to a star rating.
+
+    Parameters
+    ----------
+    status : str
+        Review status description from ClinVar.
+
+    Returns
+    -------
+    str
+        Star rating as a string: "0"-"4" or "N/A" if unknown.
+    """
+
     if not status:
         return "0"
     
@@ -301,28 +419,22 @@ def map_review_status_to_stars(status):
 
 
 if __name__ == "__main__":  # pragma: no cover
-    # Test
-    result = fetch_clinvar_variant("NC_000017.11:g.45983420G>T") # Example HGVS - should return data for all fields 
+    # Example HGVS variant
+    example_hgvs = "NC_000017.11:g.45983420G>T"
+
+    # Fetch ClinVar data and extract info
+    result = fetch_clinvar_variant(example_hgvs)
     info = get_variant_info(result)
-    
+
+    # Attributes to display
+    attrs = [
+        "chrom", "pos", "variant_id", "ref", "alt", "hgvs", "clinvar_id",
+        "clinical_significance", "star_rating", "review_status",
+        "conditions_assoc", "transcript", "ref_seq_id", "hgnc_id",
+        "omim_id", "gene_symbol", "g_change", "c_change", "p_change"
+    ]
+
     print("Variant Information:")
-    print(f"CHROM: {info.chrom}")
-    print(f"POS: {info.pos}")
-    print(f"ID: {info.variant_id}")
-    print(f"REF: {info.ref}")
-    print(f"ALT: {info.alt}")
-    print(f"HGVS: {info.hgvs}")
-    print(f"CLINVAR_ID: {info.clinvar_id}")
-    print(f"CLINICAL_SIGNIFICANCE: {info.clinical_significance}")
-    print(f"STAR_RATING: {info.star_rating}")
-    print(f"REVIEW_STATUS: {info.review_status}")
-    print(f"CONDITIONS_ASSOC: {info.conditions_assoc}")
-    print(f"TRANSCRIPT: {info.transcript}")
-    print(f"REF_SEQ_ID: {info.ref_seq_id}")
-    print(f"HGNC_ID: {info.hgnc_id}")
-    print(f"OMIM_ID: {info.omim_id}")
-    print(f"GENE_SYMBOL: {info.gene_symbol}")
-    print(f"G_CHANGE: {getattr(info, 'g_change', None)}")
-    print(f"C_CHANGE: {getattr(info, 'c_change', None)}")
-    print(f"P_CHANGE: {getattr(info, 'p_change', None)}")
+    for attr in attrs:
+        print(f"{attr.upper()}: {getattr(info, attr, None)}")
     

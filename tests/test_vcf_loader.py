@@ -1,6 +1,7 @@
+"""Tests for vcf_loader.py module."""
 import sqlite3
-from parkinsons_variant_viewer.web.loaders.vcf_loader import load_vcf_into_db
 
+from parkinsons_variant_viewer.web.loaders.vcf_loader import load_vcf_into_db
 
 def create_test_db(path):
     conn = sqlite3.connect(path)

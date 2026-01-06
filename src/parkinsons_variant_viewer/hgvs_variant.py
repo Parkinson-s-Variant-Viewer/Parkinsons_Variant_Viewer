@@ -1,8 +1,21 @@
-# src/parkinsons_variant_viewer/hgvs_variant.py
+"""
+Module for representing a single genomic variant and fetching HGVS 
+notations and MANE Select transcript information from the VariantValidator 
+LOVD API.
+
+This module defines the `HGVSVariant` class, which provides methods to:
+
+- Construct a variant with chromosome, position, reference, and alternate alleles.
+- Query the LOVD API to retrieve genomic and transcript/protein HGVS information.
+- Extract MANE Select transcripts if available.
+- Provide a convenient interface to access genomic HGVS strings.
+"""
+
+import re
 import requests
 import time
-from parkinsons_variant_viewer.utils.logger import logger
 
+from parkinsons_variant_viewer.utils.logger import logger
 
 class HGVSVariant:
     """
@@ -207,7 +220,6 @@ class HGVSVariant:
         # Sometimes the API returns a simple string with transcript info embedded
         elif isinstance(self.hgvs_t_and_p, str):
             # Use regex to search for a RefSeq transcript pattern (e.g., NM_000093.4)
-            import re
             match = re.search(r"(NM_\d+\.\d+)", self.hgvs_t_and_p)
             if match:
                 # Extract the first matching transcript

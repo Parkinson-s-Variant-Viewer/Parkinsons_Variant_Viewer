@@ -1,12 +1,11 @@
+"""Tests for upload_handler.py module."""
 import io
 import sqlite3
-import pytest
 from unittest.mock import MagicMock, patch
 
 from parkinsons_variant_viewer.web.loaders.upload_handler import (
     handle_uploaded_file,
 )
-
 
 class FakeVariantInfo:
     """Fake object to mimic ClinVar variant info."""
