@@ -111,7 +111,7 @@ python run.py web       # Run web interface
 ```
 ### Docker 
 ```bash
-make build 
+make build               # Build docker image
 make init                # Initialise database
 make load                # Load VCF files
 make annotate            # Annotate variants
