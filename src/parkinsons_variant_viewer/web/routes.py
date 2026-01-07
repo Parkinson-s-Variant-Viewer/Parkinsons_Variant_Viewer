@@ -6,6 +6,8 @@ uploading variant files. Handles rendering templates and database
 interactions.
 """
 
+import os
+
 from flask import Blueprint, render_template, request, redirect, url_for
 from .db import get_db
 
@@ -13,23 +15,15 @@ from parkinsons_variant_viewer.utils.logger import logger
 
 bp = Blueprint("web", __name__)
 
+
 @bp.route("/")
 def index():
     """
     Display the home page with a list of all variants.
-
-    Joins the `inputs` and `outputs` tables and displays both
-    manually added and ClinVar-fetched variant data.
-
-    Returns
-    -------
-    str
-        Rendered HTML template for the index page.
     """
     logger.debug("Index page accessed")
     db = get_db()
 
-    # Join the inputs and outputs tables on the composite key
     rows = db.execute("""
         SELECT 
             i.patient_id,
@@ -59,23 +53,15 @@ def index():
            AND i.variant_number = o.variant_number
         ORDER BY i.patient_id, i.variant_number
     """).fetchall()
-    
+
     logger.info(f"Displaying {len(rows)} variants on index page")
     return render_template("variants.html", variants=rows)
+
 
 @bp.route("/add", methods=["GET", "POST"])
 def add_variant():
     """
     Add a new input variant manually via a form.
-
-    GET requests render the form. POST requests insert the submitted
-    variant into the `inputs` table.
-
-    Returns
-    -------
-    str
-        Redirects to the index page after a successful POST, or renders
-        the add variant form for GET requests.
     """
     db = get_db()
 
@@ -99,21 +85,20 @@ def add_variant():
         )
 
         db.commit()
-        logger.info(f"Added variant: Patient {patient_id}, Variant {variant_number}, {chrom}:{pos} {ref}>{alt}")
+        logger.info(
+            f"Added variant: Patient {patient_id}, Variant {variant_number}, "
+            f"{chrom}:{pos} {ref}>{alt}"
+        )
         return redirect(url_for("web.index"))
-    
+
     logger.debug("Add variant form accessed (GET)")
     return render_template("add_variant.html")
+
 
 @bp.route("/inputs")
 def view_inputs():
     """
     Display a table of manually added input variants.
-
-    Returns
-    -------
-    str
-        Rendered HTML template showing all entries in the `inputs` table.
     """
     logger.debug("Inputs page accessed")
     db = get_db()
@@ -123,29 +108,18 @@ def view_inputs():
         FROM inputs
         ORDER BY patient_id, variant_number
     """).fetchall()
-    
+
     logger.info(f"Displaying {len(rows)} input variants")
     return render_template("inputs.html", inputs=rows)
+
 
 @bp.route("/upload", methods=["POST"])
 def upload_data():
     """
     Handle file uploads via AJAX and process them.
-
-    Saves the uploaded file to `data/uploads`, then calls the
-    `handle_uploaded_file` function to insert variants into the database
-    and fetch ClinVar data.
-
-    Returns
-    -------
-    tuple
-        Response message and HTTP status code.
-        - 200: Success
-        - 400: No file provided
-        - 500: Processing error
     """
     logger.info("File upload request received")
-    
+
     file = request.files.get("file")
     if not file:
         logger.warning("Upload failed: No file provided in request")
@@ -153,18 +127,27 @@ def upload_data():
 
     filename = file.filename
     logger.info(f"Processing uploaded file: {filename}")
-    
+
     try:
-        save_path = f"data/uploads/{filename}"  # ensure this folder exists
+        # create uploads directory
+        save_dir = "data/uploads"
+        os.makedirs(save_dir, exist_ok=True)
+
+        save_path = os.path.join(save_dir, filename)
         file.save(save_path)
+
         logger.info(f"File saved to: {save_path}")
 
         # Call handler to insert into DB and fetch ClinVar
         from .loaders.upload_handler import handle_uploaded_file
         handle_uploaded_file(save_path)
-        
+
         logger.info(f"Successfully processed file: {filename}")
         return "OK", 200
+
     except Exception as e:
-        logger.error(f"Error processing uploaded file {filename}: {e}", exc_info=True)
+        logger.error(
+            f"Error processing uploaded file {filename}: {e}",
+            exc_info=True
+        )
         return f"Error processing file: {str(e)}", 500
