@@ -92,7 +92,7 @@ def test_populate_db_inserts_output(temp_db, monkeypatch):
     sys.modules["parkinsons_variant_viewer.web.db"] = fake_web_db
 
     # ----------------------------------------------------
-    # 3. Import MODULE (not function!)
+    # 3. Import MODULE
     # ----------------------------------------------------
     import parkinsons_variant_viewer.populate_db as populate_db
 
