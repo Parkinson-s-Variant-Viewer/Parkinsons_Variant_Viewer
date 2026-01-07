@@ -5,6 +5,7 @@ Provides endpoints for viewing variants, adding new variants, and
 uploading variant files. Handles rendering templates and database
 interactions.
 """
+import os
 
 from flask import Blueprint, render_template, request, redirect, url_for
 from .db import get_db
@@ -155,7 +156,11 @@ def upload_data():
     logger.info(f"Processing uploaded file: {filename}")
     
     try:
-        save_path = f"data/uploads/{filename}"  # ensure this folder exists
+        # create uploads directory/make sure it exists
+        save_dir = "data/uploads"
+        os.makedirs(save_dir, exist_ok=True)
+
+        save_path = os.path.join(save_dir, filename)
         file.save(save_path)
         logger.info(f"File saved to: {save_path}")
 

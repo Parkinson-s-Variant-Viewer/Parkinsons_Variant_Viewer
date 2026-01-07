@@ -209,3 +209,4 @@ __marimo__/
 /.vscode/
 data/input/*
 !data/input/.gitkeep
+data/uploads
