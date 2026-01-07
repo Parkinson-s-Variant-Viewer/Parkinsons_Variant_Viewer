@@ -101,7 +101,7 @@ python run.py web
 make web
 ```
 
-## ⚡ 6. Common Workflow Example
+## ⚡ 6. Common Workflow 
 ### Local 
 ```bash
 python run.py init-db   # Initialise database
