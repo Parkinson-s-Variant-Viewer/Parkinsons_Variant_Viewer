@@ -53,7 +53,7 @@ The PVV workflow involves:
 ---
 ## 🗄️ 2. Database Initialisation
 
-> **Note:** Please ensure PVV is installed as per the [Installation manual](docs/INSTALLATION.md).
+> **Note:** Please ensure PVV is installed as per the [Installation manual](INSTALLATION.md).
 ---
 ### Local 
 
@@ -122,6 +122,6 @@ make web                 # Run web interface
 
 ## 📚 7. Support & Documentation
 
-- Installation Guide: see [Installation manual](docs/INSTALLATION.md).
-- User Guide: [User Manual](docs/USER_MANUAL.md)
+- Installation Guide: see [Installation manual](INSTALLATION.md).
+- User Guide: [User manual](USER_MANUAL.md)
 - For technical issues or bug reports, please contact the development team.
