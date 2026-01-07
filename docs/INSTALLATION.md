@@ -130,3 +130,9 @@ make load
 make annotate
 make web
 ```
+
+## Support & Documentation
+
+- Installation Guide: see [Installation manual](INSTALLATION.md).
+- User Guide: [User Manual](USER_MANUAL.md)
+- For technical issues or bug reports, please contact the development team.

@@ -49,10 +49,12 @@ The PVV workflow involves:
 - Files must follow the naming convention: `Patient[number].vcf` (e.g. `Patient1.vcf`)
 
 > **Note:** Only **one VCF file** is initially required  to configure the database.  
-> Once the database and web interface are set up, additional patient VCF or CSV files can be uploaded directly through the **Upload** feature in the web interface.
+> Once the database and web interface are set up, additional patient VCF or CSV files can be uploaded directly through the **Upload** feature on the web app.
 ---
 ## 🗄️ 2. Database Initialisation
 
+> **Note:** Please ensure PVV is installed as per the [Installation manual](INSTALLATION.md).
+---
 ### Local 
 
 ```bash
@@ -120,6 +122,6 @@ make web                 # Run web interface
 
 ## 📚 7. Support & Documentation
 
-- Installation Guide: INSTALLATION.md
-- User Guide: USER_MANUAL.md
+- Installation Guide: see [Installation manual](INSTALLATION.md).
+- User Guide: [User manual](USER_MANUAL.md)
 - For technical issues or bug reports, please contact the development team.
