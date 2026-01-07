@@ -8,7 +8,7 @@
 
 ---
 
-**Parkinsons Variant Viewer** is a web-based application designed to help Clinical Scientists analyze and annotate genetic variants associated with Parkinson's disease. The tool integrates data from multiple sources to provide comprehensive variant information for users.
+**Parkinsons Variant Viewer** is a web-based application designed to help Clinical Scientists analyse and annotate genetic variants associated with Parkinson's disease. The tool integrates data from multiple sources to provide comprehensive variant information for users.
 
 Parkinson's disease is a progressive neurodegenerative disorder affecting movement, and genetic factors play a significant role in both familial and sporadic cases. Understanding the clinical significance of potentially pathogenic variants is crucial for accurate diagnosis, prognosis, potential therapeutic interventions and future research.
 
@@ -17,7 +17,7 @@ This tool was developed by second year STP students at the University of Manches
 **External Resources:**
 
 - [**ClinVar**](https://www.ncbi.nlm.nih.gov/clinvar/) - NCBI's public archive of variant interpretations and clinical significance
-- [**HGNC**](https://www.genenames.org/) - HUGO Gene Nomenclature Committee's standardized gene naming database
+- [**HGNC**](https://www.genenames.org/) - HUGO Gene Nomenclature Committee's standardised gene naming database
 - [**OMIM**](https://www.omim.org/) - Online Mendelian Inheritance in Man catalog of human genes and genetic disorders
 
 ### ✨ Key Features
@@ -26,7 +26,7 @@ This tool was developed by second year STP students at the University of Manches
 
 -  **VCF File Processing**: Load and parse VCF files containing genetic variant data
 -  **ClinVar Integration**: Automatically fetch clinical significance, review status, and associated conditions from ClinVar
--  **HGNC Gene Nomenclature**: Retrieve standardized gene symbols and HGNC IDs
+-  **HGNC Gene Nomenclature**: Retrieve standardised gene symbols and HGNC IDs
 -  **Interactive Web Interface**: Search, filter, and explore variants through an intuitive table view
 -  **Database Storage**: SQLite database for efficient variant data management
 -  **Detailed Annotations**: View chromosome position, reference/alternate alleles, HGVS nomenclature, transcript information, and more
@@ -44,8 +44,7 @@ It aims to enable them to:
 
 ## 🚀 Installation
 
-See basic local installation below. For Dockerised install and more details, see 
-docs/INSTALLATION.md 
+See basic local installation below. For Dockerised install and more details, see [Installation manual](docs/INSTALLATION.md).
 
 ---
 
@@ -53,30 +52,32 @@ docs/INSTALLATION.md
 ```bash
 git clone https://github.com/Parkinson-s-Variant-Viewer/Parkinsons_Variant_Viewer.git
 ```
-
-**Step 2: Create the conda environment**
+#### Step 2: Change directory
+```bash
+cd Parkinsons_Variant_Viewer
+```
+**Step 3: Create the conda environment**
 ```bash
 conda env create -f environment.yml 
 conda activate pvv_conda
 ```
 
-**Step 3: Install requirements**
+**Step 4: Install requirements**
 ```bash
 pip install -r requirements.txt
 ```
 
-**Step 4: Install Parkinsons Variant Viewer**
+**Step 5: Install Parkinsons Variant Viewer**
 ```bash
 python -m pip install -e . 
 ```
 
-For detailed installation instructions, see `Installation_manual.md`
 
 ## 📚 User Guide
 
 ---
 
-See docs/USER_MANUAL.md
+See [User manual](docs/USER_MANUAL.md)
 
 ## 👥 Authors
 
