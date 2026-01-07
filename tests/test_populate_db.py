@@ -7,7 +7,7 @@ import types
 
 @pytest.fixture
 def temp_db(tmp_path):
-    """Create a temporary database with inputs and outputs tables."""
+    """Create a temporary database with an inputs and outputs tables."""
     db_path = tmp_path / "test.db"
     conn = sqlite3.connect(db_path)
 
