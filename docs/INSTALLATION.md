@@ -50,6 +50,14 @@ All functionality, including building the Docker image, initiating and resetting
 - For Windows: Install GNU Make. [Download Here](https://gnuwin32.sourceforge.net/packages/make.htm) and install by following [these instructions.](https://leangaurav.medium.com/how-to-setup-install-gnu-make-on-windows-324480f1da69)
 
 ---
+#### Clone the repository
+
+Follow the same steps as the local installation guide to clone the repository and change directory. 
+
+```bash
+git clone https://github.com/Parkinson-s-Variant-Viewer/Parkinsons_Variant_Viewer.git
+cd Parkinsons_Variant_Viewer
+```
 
 #### Build the Docker image
 
