@@ -252,7 +252,7 @@ class HGVSVariant:
         return self.hgvs_genomic
 
 
-if __name__ == "__main__":
+if __name__ == "__main__": # pragma: no cover
     var = HGVSVariant("17", 45983420, "G", "T")
     print(var.fetch())
     print(var.get_hgvs())
