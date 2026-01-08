@@ -2,7 +2,11 @@
 name = "parkinsons_variant_viewer"
 version = "0.0.1"
 description = "a platform to view variants for a Parkinson's study"
-authors = [{name = "parkinsons_variant_validator Contributors", email = "ruqayyah.peerbhai@postgrad.manchester.ac.uk"}]
+authors = [
+    {name = "Ruqayyah Peerbhai", email = "ruqayyah.peerbhai@postgrad.manchester.ac.uk"},
+    {name = "Rebekah Embers", email = "rebekah.newman@postgrad.manchester.ac.uk"}, 
+    {name = "Patrick Lahert", email = "patrick.lahert@postgrad.manchester.ac.uk"}
+]
 readme = "README.md"
 requires-python = ">=3.11"
 
@@ -10,12 +14,19 @@ requires-python = ">=3.11"
 [tool.setuptools.dynamic]
 dependencies = {file = ["requirements.txt"]}
 
-[tool.setuptools_scm]
-
-[tool.setuptools.packages.find]
-where = ["."]  # Look for packages in the 'root' directory
-
-
 [build-system]
 requires = ["setuptools>=45", "setuptools_scm[toml]>=6.2", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+include-package-data = true
+
+[tool.setuptools.package-data]
+"parkinsons_variant_viewer.web" = ["schema.sql"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
